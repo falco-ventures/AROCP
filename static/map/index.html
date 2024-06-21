@@ -21,6 +21,7 @@
     <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
     <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
     <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+    <script src="/AROCP/js/main.js"></script>
 
     <style>
         html,
@@ -240,22 +241,6 @@
             rawFile.send(null);
         }
 
-        function sendCommand(commandName, paramString, callback) {
-            function reqListener() {
-                // console.log(this.responseText);
-                try {
-                    callback(this);
-                } catch {
-                    callback(null);
-                }
-            }
-
-            const req = new XMLHttpRequest();
-            req.addEventListener("load", reqListener);
-            var url = commandName + "?" + paramString
-            req.open("GET", url);
-            req.send();
-        }
         var gSelectionName = "Jita";
         function create_selection_sphere(name) {
             if (gSelectionSphere != null) {
@@ -404,9 +389,6 @@
             // // var pickResult = window.scene.pick(window.scene.pointerX, window.scene.pointerY);
             // var pickResult = window.scene.pickWithRay(ray);
             // console.log(pickResult)
-        }
-        function login_results(response) {
-            console.log(JSON.stringify(response));
         }
         function click_login() {
             var eveServer = "https://login.eveonline.com/oauth/authorize"
