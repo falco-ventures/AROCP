@@ -170,12 +170,13 @@
         <a id="downloadAnchorElem" href="javascript:click_download()">
             <div class="bet_time2"><img width=256px src="skymap2.png"></div>
         </a>
-        <div class="bet_time"><img width=256px src="skymap1.jpg"></div>
+        <a id="downloadAnchorElem" href="javascript:click_login()">
+            <div class="bet_time"><img width=256px src="skymap1.jpg"></div>
+        </a>
         <div class="bet_time3"><img width=256px src="skymap3.jpg"></div>
         <div class="bet_time4"><img width=256px src="skymap4.jpg"></div>
     </div>
     <script>
-
         var gUniverse = null;
         var g3DScene;
         var gHoverPlaneTexture;
@@ -243,7 +244,7 @@
             function reqListener() {
                 // console.log(this.responseText);
                 try {
-                    callback(JSON.parse(this.responseText));
+                    callback(this);
                 } catch {
                     callback(null);
                 }
@@ -403,6 +404,15 @@
             // // var pickResult = window.scene.pick(window.scene.pointerX, window.scene.pointerY);
             // var pickResult = window.scene.pickWithRay(ray);
             // console.log(pickResult)
+        }
+        function login_results(response) {
+            console.log(JSON.stringify(response));
+        }
+        function click_login() {
+            var eveServer = "https://login.eveonline.com/oauth/authorize"
+            var scopes = "response_type=code&redirect_uri=https://falco-ventures.github.io/AROCP/&client_id=db8e339897bb417f971ff07ef617e967&scope=publicData%20esi-location.read_location.v1%20esi-location.read_ship_type.v1%20esi-skills.read_skills.v1%20esi-skills.read_skillqueue.v1%20esi-universe.read_structures.v1%20esi-ui.write_waypoint.v1%20esi-fittings.read_fittings.v1%20esi-fittings.write_fittings.v1%20esi-location.read_online.v1%20esi-clones.read_implants.v1%20esi-characters.read_fatigue.v1";
+            window.location= eveServer + "?" + scopes;
+
         }
         function click_download() {
             var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gUniverse));
@@ -898,7 +908,8 @@
         };
         var gUniverseScale = 1.0;
         var gCurrentSystemIO = 0;
-        function ProcessSystem(systemData) {
+        function ProcessSystem(systemData_i) {
+            var systemData = JSON.parse(systemData_i.responseText);
             if (systemData != null) {
                 gSystems[systemData.system_id] = systemData;
                 if (gCurrentSystemIO < gSystemList.length) {
@@ -913,7 +924,8 @@
             }
 
         }
-        function GetNextSystem(data) {
+        function GetNextSystem(data_i) {
+            var data = JSON.parse(data_i.responseText);
             var callback = startApplication;
             if (gSystemList.length == 0) {
                 gSystemList = data;

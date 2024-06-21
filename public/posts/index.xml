@@ -13,7 +13,7 @@
       <link>http://localhost:1313/AROCP/posts/my-first-post/</link>
       <pubDate>Tue, 18 Jun 2024 20:11:33 -0400</pubDate>
       <guid>http://localhost:1313/AROCP/posts/my-first-post/</guid>
-      <description>Introduction This is bold text, and this is emphasized text.&#xA;Visit the Hugo website!</description>
+      <description>Introduction Welcome to AeroCorp, please log in below&#xA;Test&#xA;Test</description>
     </item>
   </channel>
 </rss>
