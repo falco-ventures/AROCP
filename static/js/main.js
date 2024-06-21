@@ -92,7 +92,7 @@ function sendCommand(commandName, paramString , callback, command_type, headers,
             req.setRequestHeader(String(header),String(headers[header]));
         }
     }
-    req.setRequestHeader('Access-Control-Allow-Origin',"https://localhost:1313");
+    req.setRequestHeader('Access-Control-Allow-Origin',window.location.origin);
 
     if (body != undefined && body != null) {
         //Send the proper header information along with the request
