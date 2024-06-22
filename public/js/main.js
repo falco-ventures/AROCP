@@ -128,9 +128,9 @@ function authorization_callback(data, callback_data) {
         console.log("Requested " + callback_data.code + " and got " + data.responseText);
         
         // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
-        try {
+        try { 
             var loginCredentials = JSON.parse(data.responseText);
-            var base = "https://login.eveonline.com/oauth/verify";
+            var base = "https://esi.evetech.net/verify/";
             var paramString = "";
             var command_type = "GET";
             var headers = {};
