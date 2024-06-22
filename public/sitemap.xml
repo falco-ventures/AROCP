@@ -2,17 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/AROCP/</loc>
+    <loc>http://localhost:1313/AROCP/public/</loc>
     <lastmod>2024-06-18T20:11:33-04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/AROCP/posts/</loc>
+    <loc>http://localhost:1313/AROCP/public/posts/</loc>
     <lastmod>2024-06-18T20:11:33-04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/AROCP/posts/my-first-post/</loc>
+    <loc>http://localhost:1313/AROCP/public/posts/my-first-post/</loc>
     <lastmod>2024-06-18T20:11:33-04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/AROCP/categories/</loc>
+    <loc>http://localhost:1313/AROCP/public/categories/</loc>
   </url><url>
-    <loc>http://localhost:1313/AROCP/tags/</loc>
+    <loc>http://localhost:1313/AROCP/public/tags/</loc>
   </url>
 </urlset>
