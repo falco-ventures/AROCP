@@ -1,0 +1,17 @@
+{
+    "characters": [
+        {
+            "CharacterID": 2122278309,
+            "CharacterName": "AeroPete",
+            "ExpiresOn": "2024-06-22T00:55:06",
+            "Scopes": "publicData esi-location.read_location.v1 esi-location.read_ship_type.v1 esi-skills.read_skills.v1 esi-skills.read_skillqueue.v1 esi-universe.read_structures.v1 esi-ui.write_waypoint.v1 esi-fittings.read_fittings.v1 esi-fittings.write_fittings.v1 esi-location.read_online.v1 esi-clones.read_implants.v1 esi-characters.read_fatigue.v1",
+            "TokenType": "Character",
+            "CharacterOwnerHash": "CA2DmP2Dx3e72JLAV9pf+tGU4qU=",
+            "IntellectualProperty": "EVE",
+            "access_token": "1|CfDJ8ALNx46Sy8FFiKQhFaZug5zCBeFG864G3sn8Ti1rmR9t/A1Kbr8GPYAuu53e9a7k3arZl8J6UaKAvvVmUjIbI05OHJ9BlYHm4vlaSTer9mwmCdH3F51uk6lxFCWtnVZs7L+xQYuPJdTVHMGIPTcG0xF9KeIvx9gbhLafCMTFjDkR",
+            "token_type": "Bearer",
+            "expires_in": 1199,
+            "refresh_token": "ZLc7KX-S4LWNhklga5UAipLW-8_byJBsco3Dwg1xtJL4ck-WNm5yJXYd6u3TNSfs8xaMZ998C-53xUh6Pf3Cf-u89ojhYeH7WBoSG_jItBw"
+        }
+    ]
+}
