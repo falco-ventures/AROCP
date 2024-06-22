@@ -14,7 +14,7 @@ echo "<h2>$txt1</h2>";
 
 $entityBody = file_get_contents('php://input');
 // echo "link = ";
-echo "<p>{\"code\":\"" + $entityBody + "\"}</p>";
+echo "<p>Body $entityBody</p>";
 echo "<p>Study PHP at $txt2</p>";
 
  
