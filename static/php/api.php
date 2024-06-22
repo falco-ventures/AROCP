@@ -54,7 +54,7 @@ $code = $_GET['code'];
 // echo "<h2>$code</h2>";
 $data = array("code" => $code , "grant_type" => "authorization_code");                                                                    
 $data_string = json_encode($data);     
-
+echo $data_string;
 $result = CurlSendPostRequest("https://login.eveonline.com/oauth/token", $data_string);
 echo $result;
 

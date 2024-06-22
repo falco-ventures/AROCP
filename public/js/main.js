@@ -151,7 +151,7 @@ function authorize_character_code(code) {
     // curl -XPOST -H "Content-Type:application/json" -H "Authorization:Basic Y2xpZW50X2lkOmNsaWVudHNlY3JldDE=" -d '{"grant_type":"authorization_code", "code":"ckEZIa6JUOdoN6ijmqBI...qgpU-SmPsZ0"}' https://login.eveonline.com/oauth/token
 
 
-    var base = "https://instacardapp.com/AROCP/public/php/api.php"//https://login.eveonline.com/oauth/token";
+    var base = "https://instacardapp.com/AROCP/public/php/api.php?code=" + code;//https://login.eveonline.com/oauth/token";
     var paramString = "";
     var command_type = "GET";
     var headers = {};
@@ -160,9 +160,9 @@ function authorize_character_code(code) {
     // headers["Content-Length"] = "Basic " + auth;
 
     
-    var bodyObject = {};
-    bodyObject["grant_type"] = "authorization_code";
-    bodyObject["code"] = code;
+    // var bodyObject = {};
+    // bodyObject["grant_type"] = "authorization_code";
+    // bodyObject["code"] = code;
     var callback_data = code;
 /*
 TODO:
@@ -173,7 +173,7 @@ Note that access tokens are only valid for 20 minutes, after which you can re-ru
       "refresh_token":"{the refresh token}"
     }
     */
-    sendCommand(base, paramString,authorization_callback, command_type, headers, bodyObject, callback_data);
+    sendCommand(base, paramString,authorization_callback, command_type, headers, null, callback_data);
     
 }
 function download_character_info() {
