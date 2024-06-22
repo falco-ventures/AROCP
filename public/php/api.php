@@ -12,10 +12,10 @@ $txt2 = "W3Schools.com";
 $code = "Hello"
 echo "<h2>$txt1</h2>";
 
+$entityBody = file_get_contents('php://input');
 // echo "link = ";
-echo "<p>{\"code\":\"" + $code + "\"}</p>";
+echo "<p>{\"code\":\"" + $entityBody + "\"}</p>";
 echo "<p>Study PHP at $txt2</p>";
-
 
  
 // $data = array("code" => $code , "grant_type" => "authorization_code");                                                                    
