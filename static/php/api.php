@@ -8,7 +8,7 @@ $txt2 = "W3Schools.com";
 
 
 // From URL to get webpage contents.
-$code = $_GET['code']
+$code = $_REQUEST['code']
 
 echo "<h2>$txt1</h2>";
 
