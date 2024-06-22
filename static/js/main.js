@@ -150,7 +150,6 @@ function authorize_character_code(code) {
     // console.log("Requesting character data for: " + code)
     // curl -XPOST -H "Content-Type:application/json" -H "Authorization:Basic Y2xpZW50X2lkOmNsaWVudHNlY3JldDE=" -d '{"grant_type":"authorization_code", "code":"ckEZIa6JUOdoN6ijmqBI...qgpU-SmPsZ0"}' https://login.eveonline.com/oauth/token
 
-
     var base = "https://instacardapp.com/AROCP/public/php/api.php";////https://login.eveonline.com/oauth/token";
     var paramString = "code=" + code;
     var command_type = "GET";
