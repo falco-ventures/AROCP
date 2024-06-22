@@ -49,6 +49,7 @@ function CurlSendPostRequest($url,$request)
 
 // From URL to get webpage contents.
 $code = $_GET['link']
+echo "link = ";
 echo $code;
 // $data = array("code" => $code , "grant_type" => "authorization_code");                                                                    
 // $data_string = json_encode($data);     
