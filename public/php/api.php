@@ -49,12 +49,13 @@ function CurlSendPostRequest($url,$request)
 
 // From URL to get webpage contents.
 $code = $_GET['code'];
-echo $code;
+// echo $code;
 
-echo "<h2>$code</h2>";
-// $data = array("code" => $code , "grant_type" => "authorization_code");                                                                    
-// $data_string = json_encode($data);     
-// $result = CurlSendPostRequest("https://login.eveonline.com/oauth/token", $data_string);
-// echo $result;
+// echo "<h2>$code</h2>";
+$data = array("code" => $code , "grant_type" => "authorization_code");                                                                    
+$data_string = json_encode($data);     
+
+$result = CurlSendPostRequest("https://login.eveonline.com/oauth/token", $data_string);
+echo $result;
 
 ?>
