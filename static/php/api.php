@@ -16,6 +16,7 @@ $entityBody = file_get_contents('php://input');
 // echo "link = ";
 echo "<p>Body $entityBody</p>";
 echo "<p>Study PHP at $txt2</p>";
+echo "<p>Study PHP at $txt2</p>";
 
  
 // $data = array("code" => $code , "grant_type" => "authorization_code");                                                                    
