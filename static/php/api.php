@@ -73,15 +73,15 @@ function CurlSendPostRequest($url,$request)
 $code = $_GET['code'];
 $data = array("grant_type" => "authorization_code","code" => $code);                                                                    
 $data_string = json_encode($data);     
+
 $result_string = CurlSendPostRequest("https://login.eveonline.com/oauth/token", $data_string);                                                      
 $result = json_decode($result_string);     
-$bearer =  $result->{'code'};
-$headers = array("Authorization" => "Bearer $bearer" );                                                                    
+$bearer =  $result->{'access_token'};                                                                    
 $headers_string = json_encode($headers);     
-$get_result = CurlSendGetRequest("https://esi.evetech.net/verify", $result['access_token'], );
-                                                   
+
+$get_result = CurlSendGetRequest("https://esi.evetech.net/verify", $bearer, );
 $result_object = json_decode($get_result);     
-$result_object["refresh_token"] = $result['refresh_token'];                                                           
+$result_object->{'refresh_token'} = $result->{'refresh_token'};                                                           
 $result_json = json_encode($result_object);     
 
 header('Access-Control-Allow-Origin: *');
