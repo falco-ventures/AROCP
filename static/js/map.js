@@ -16,19 +16,20 @@ var gMeshes = new Array();
 var canvas = document.getElementById("renderCanvas");
 var engine = null;
 var sceneToRender = null;
-// var scene = null;
-var SPS = null;
+var pcs;
+
 var startRenderLoop = function (engine, canvas) {
     engine.runRenderLoop(function () {
         if (sceneToRender != null) {
 
-            // SPS.setParticles();
             sceneToRender.render();
 
         }
     });
 }
-
+function Get3DScene() {
+    return sceneToRender;
+}
 var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false }); }
 
 
@@ -37,10 +38,10 @@ function create_selection_sphere(name) {
         gSelectionSphere.dispose();
         gSelectionPlane.dispose();
     }
-    var sphere = BABYLON.MeshBuilder.CreateSphere("SelectionSphere", { diameter: 0.5, segments: 32 }, g3DScene);
-    var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 2, height: 1 }, g3DScene);
-    var planeMaterial = new BABYLON.StandardMaterial("SelectionMaterial", g3DScene);
-    var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("SelectionTexture", { width: 512, height: 256 }, g3DScene);
+    var sphere = BABYLON.MeshBuilder.CreateSphere("SelectionSphere", { diameter: 0.5, segments: 32 }, sceneToRender);
+    var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 2, height: 1 }, Get3DScene());
+    var planeMaterial = new BABYLON.StandardMaterial("SelectionMaterial", Get3DScene());
+    var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("SelectionTexture", { width: 512, height: 256 }, Get3DScene());
     planeTexture.getContext();
     planeTexture.hasAlpha = true;
     planeTexture.drawText(name, 0, 100, "bold 44px Arial", "white", "transparent", true, true);
@@ -63,17 +64,17 @@ function create_selection_sphere(name) {
 }
 
 function create_hover_sphere(name) {
-    var sphere = BABYLON.MeshBuilder.CreateSphere("HoverSphere", { diameter: 0.5, segments: 32 }, g3DScene);
+    var sphere = BABYLON.MeshBuilder.CreateSphere("HoverSphere", { diameter: 0.5, segments: 32 }, Get3DScene());
     sphere.isPickable = false;
-    var sphereMaterial = new BABYLON.StandardMaterial("SphereMaterial", g3DScene);
+    var sphereMaterial = new BABYLON.StandardMaterial("SphereMaterial", Get3DScene());
     sphereMaterial.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
     sphere.material = sphereMaterial
 
 
-    var plane = BABYLON.MeshBuilder.CreatePlane("HoverPlane", { width: 2, height: 1 }, g3DScene);
+    var plane = BABYLON.MeshBuilder.CreatePlane("HoverPlane", { width: 2, height: 1 }, Get3DScene());
     plane.isPickable = false;
-    var planeMaterial = new BABYLON.StandardMaterial("HoverMaterial", g3DScene);
-    var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("HoverTexture", { width: 512, height: 256 }, g3DScene);
+    var planeMaterial = new BABYLON.StandardMaterial("HoverMaterial", Get3DScene());
+    var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("HoverTexture", { width: 512, height: 256 }, Get3DScene());
     planeTexture.getContext();
     planeTexture.hasAlpha = true;
     var label = name;
@@ -97,7 +98,6 @@ function create_hover_sphere(name) {
 }
 
 
-var pcs;
 function vecToLocal(vector, mesh) {
     var m = mesh.getWorldMatrix();
     var v = BABYLON.Vector3.TransformCoordinates(vector, m);
@@ -105,19 +105,7 @@ function vecToLocal(vector, mesh) {
 }
 
 function mousemovef() {
-    // var origin = gCamera.position;
-
-    // var forward = new BABYLON.Vector3(0, 0, 1);
-    // forward = vecToLocal(forward, pcs);
-
-    // var direction = forward.subtract(origin);
-    // direction = BABYLON.Vector3.Normalize(direction);
-
-    // var ray = new BABYLON.Ray(origin, direction, length);
-    // // var pickResult = window.scene.pick(window.scene.pointerX, window.scene.pointerY);
-    // var pickResult = window.scene.pickWithRay(ray);
-    // console.log(pickResult)
-}
+    }
 
 
 BABYLON.AbstractMesh.prototype.addPickingBox = function () {
@@ -128,7 +116,7 @@ BABYLON.AbstractMesh.prototype.addPickingBox = function () {
     var bounds = _this.getBoundingInfo().boundingBox.extendSize.clone();
     bounds = bounds.multiplyByFloats(10, 10, 10);
 
-    _this._picking_box = BABYLON.Mesh.CreateBox('pBox', 1, g3DScene);
+    _this._picking_box = BABYLON.Mesh.CreateBox('pBox', 1, Get3DScene());
     _this._picking_box.scaling = bounds.clone();
     _this._picking_box.parent = _this;
     _this._picking_box.visibility = 0.25; //0.0001;
@@ -137,13 +125,12 @@ BABYLON.AbstractMesh.prototype.addPickingBox = function () {
     _this.isPickable = false;
     return _this;
 };
-var createScene = async function (universe) {
+var createScene = async function (systems_json) {
     // if(gInitialized == false) {
     //     gInitialized = true;
     //     return;
     // }
 
-    gSystemMap = new Object();
     if (sceneToRender != null)
         return null;
     var scene = new BABYLON.Scene(engine);
@@ -186,242 +173,26 @@ var createScene = async function (universe) {
         return material.colorify;
     });
 
-    var keys = Object.keys(universe);
-    keys.sort();
-
-    var pcs = null;
-    // pcs = new BABYLON.PointsCloudSystem("pcs", 10, scene);
-
-    const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
-    const light2 = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, -1, 0), scene);
-    var showPoints = true;
-    var poly = null;
-
-    if (showPoints) {
-        pcs = new BABYLON.PointsCloudSystem("pcs", 30, scene);
-    } else {
-
-        //const sphere = BABYLON.MeshBuilder.CreateSphere("s", {});
-        var poly = BABYLON.MeshBuilder.CreateBox("system0", { size: 0.1, isPickable: true }, scene);
-        // poly.addPickingBox();
-        // var sphereMaterial = new BABYLON.StandardMaterial("SphereMaterial", scene);
-        // sphereMaterial.backFaceCulling = false;
-        // sphereMaterial.disableLighting = true;
-        // // sphereMaterial.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-        // poly.material = sphereMaterial
-        // *** Create a lookup of initial indicies to particles
-        gMeshes.push(poly);
-    }
-    let particleIndLookup = {};
-
-    const insideColor = BABYLON.Color3.FromHexString("#888888");
-    const outsideColor = BABYLON.Color3.FromHexString("#888888");
-
-    // var numPoints = points.length;
-
-    const positions = [];
-    const colors = [];
-    const sizes = [];
-    var bands = [[[], [], [], [], [], [], [], []], [[], [], [], [], [], [], [], []], [[], [], [], [], [], [], [], []], [[], [], [], [], [], [], [], []], [[], [], [], [], [], [], [], []], [[], [], [], [], [], [], [], []], [[], [], [], [], [], [], [], []], [[], [], [], [], [], [], [], []]];
-
-
     create_selection_sphere("Jita");
     create_hover_sphere("Jita");
-    for (var i = 0; i < keys.length; ++i) {
-        // for (var system in universe) {
-        var system = keys[i];
-        var systemName = universe[system].name;
-        // if(systemName == undefined || !systemName.includes("NGC"))
-        //      continue;
+    
 
-        universe[system].position.x = universe[system].position.x / metersPerAu;
-        universe[system].position.y = universe[system].position.y / metersPerAu;
-        universe[system].position.z = universe[system].position.z / metersPerAu;
-        gSystemMap[systemName] = universe[system];
-        let x = gScale * universe[system].position.x;
-        let y = gScale * universe[system].position.y;
-        let z = gScale * universe[system].position.z;
-        let security = universe[system].security_status;
-        let magnitude = 500;
-        var purple = [1, 0, 1];
-        var blue = [0, 0, 1];
-        var cyan = [0, 1, 1];
-        var green = [0, 1, 0];
-        var yellow = [1, 1, 0];
-        var orange = [1, 0.5, 0];
-        var red = [1, 0.6, 0.6];
-        var darkRed = [1, 0.2, 0.2];
+    for (const space_name in gUniverse) {
+        pcs = gUniverse[space_name].pcs;
 
-        var color = black;
-        var band = 0;
-        var octant = 0;
-        if (x > 0) {
-            if (y > 0) {
-                if (z > 0) {
-                    octant = 1;
-                } else {
-                    octant = 2;
-                }
-            } else {
-                if (z > 0) {
-                    octant = 3;
-                } else {
-                    octant = 4;
-                }
-            }
-        } else {
-            if (y > 0) {
-                if (z > 0) {
-                    octant = 5;
-                } else {
-                    octant = 6;
-                }
-            } else {
-                if (z > 0) {
-                    octant = 7;
-                } else {
-                    octant = 8;
-                }
-            }
-        }
-        var systemType = "unknown";
-
-        if (universe[system].system_id < 31000000) {
-
-            if (security <= 0.0) {
-                systemType = "nullsec";
-            } else if (security < 0.5) {
-                systemType = "losec";
-            } else {
-                systemType = "hisec";
-            }
-        }
-        else if (universe[system].system_id > 31000000 &&
-            universe[system].system_id < 32000000) {
-            if (systemName[1] == '0') {
-                systemType = "shatteredwormhole"
-            } else {
-                systemType = "wormhole";
-            }
-        }
-        else if (universe[system].system_id > 32000000 &&
-            universe[system].system_id < 33000000) {
-            systemType = "adspace";
-        }
-        else if (universe[system].system_id > 34000000 &&
-            universe[system].system_id < 35000000) {
-            systemType = "vspace";
-        }
-
-        if (security <= 0.1) {
-            color = darkRed;
-            band = 0;
-        } else if (security <= 0.2) {
-            color = darkRed;
-            band = 1;
-        } else if (security <= 0.3) {
-            color = red;
-            band = 2;
-        } else if (red <= 0.4) {
-            color = red;
-            band = 3;
-        } else if (security <= 0.5) {
-            color = yellow;
-            band = 4;
-        } else if (security <= 0.6) {
-            color = cyan;
-            band = 5;
-        } else if (security <= 0.7) {
-            color = green;
-            band = 6;
-        } else {
-            color = blue;
-            band = 7;
-        }
-        if (octant) {
-            bands[band][octant - 1] = universe[system];
-        }
-
-
-        // if (universe[systemName].system_id < 31000000) {
-        positions.push(new BABYLON.Vector3(x, y, z));
-        sizes.push(new BABYLON.Vector3(magnitude, magnitude, magnitude));
-
-        const babylonColor = new BABYLON.Color3(color[0], color[1], color[2]);
-        colors.push(BABYLON.Color4.FromColor3(babylonColor, 1));
-        // }
-        // *** Add to our lookup of initial indicies to particles
-
-    }
-    for (let p = 0; p < positions.length; p++) {
-        var position = positions[p];
-        if (gUniverseMax.x < position.x) {
-            gUniverseMax.x = position.x;
-        }
-        if (gUniverseMax.y < position.y) {
-            gUniverseMax.y = position.y;
-        }
-        if (gUniverseMax.z < position.z) {
-            gUniverseMax.z = position.z;
-        }
-
-        if (gUniverseMin.x > position.x) {
-            gUniverseMin.x = position.x;
-        }
-        if (gUniverseMin.y > position.y) {
-            gUniverseMin.y = position.y;
-        }
-        if (gUniverseMin.z > position.z) {
-            gUniverseMin.z = position.z;
-        }
-    }
-
-    var xSize = gUniverseMax.x - gUniverseMin.x;
-    var ySize = gUniverseMax.y - gUniverseMin.y;
-    var zSize = gUniverseMax.z - gUniverseMin.z;
-    var maxSize = xSize;
-    if (ySize > xSize) {
-        maxSize = ySize;
-    }
-    if (zSize > maxSize) {
-        maxSize = zSize;
-    }
-    gUniverseScale = maxSize;
-
-
-    if (showPoints) {
-        pcs.addPoints(positions.length, (particle, i) => {
-            particle.position.x = positions[i].x ;
-            particle.position.y = positions[i].y ;
-            particle.position.z = positions[i].z ;
-            particle.color = colors[i];
-            particle.scale = sizes[i];
+        var keys = Object.keys(gUniverse[space_name].systems);
+        pcs.addPoints(keys.length, (particle, i) => {
+            var system = keys[i];
+            var position = gUniverse[space_name].systems[system].position;
+            particle.position.x = position.x;
+            particle.position.y = position.y;
+            particle.position.z = position.z;
+            particle.color = gUniverse[space_name].systems[system].color;
         });
         await pcs.buildMeshAsync();
         pcs.mesh.material.sizeAttenuationPlugin.isEnabled = true;
-    } else {
-        for (let p = 0; p < colors.length; p++) {
-            var particle;
-            if (p == 0) {
-                particle = gMeshes[p];
-            } else {
-                particle = poly.clone("system" + p);
-                gMeshes.push(particle);
-            }
-
-            particle.position = positions[p];
-            var sphereMaterial = new BABYLON.StandardMaterial("material" + p, g3DScene);
-            sphereMaterial.diffuseColor = colors[p];
-            particle.material = sphereMaterial
-            // particle.material.emissiveColor = colors[p];
-
-            particle.scale = sizes[p];
-            particle.id = p;
-            particleIndLookup[particle._ind] = particle;
-        }
     }
-
-    g3DScene = scene;
+    
     scene.onPointerObservable.add((pointerInfo) => {
         switch (pointerInfo.type) {
             case BABYLON.PointerEventTypes.POINTERDOWN:
@@ -453,26 +224,6 @@ var createScene = async function (universe) {
         }
     });
 
-    scene.onPointerDown = (evt, pickInfo) => {
-        var pickResult = g3DScene.pick(g3DScene.pointerX, g3DScene.pointerY);
-        var pickResult = g3DScene.pickWithRay(g3DScene.activeCamera.getForwardRay(800));
-        // const pickPartInfo = SPS.pickedParticle(pickInfo);
-        if (pickResult.hit) {
-            console.log("Picked!")
-            console.log(pickResult);
-            // const pickPart = SPS.particles[pickPartInfo.idx];
-            // console.log(pickPart);
-            // const projPos = BABYLON.Vector3.Project(
-            //     pickPart.position,
-            //     BABYLON.Matrix.Identity(),
-            //     camera.getTransformationMatrix(),
-            //     { x: 0, y: 0, width: canvas.width, height: canvas.height });
-            // console.log('screen pos', projPos);
-            // const can = document.querySelector("#renderCanvas");
-            // dot.style.left = (projPos.x + can.getBoundingClientRect().left).toFixed(0) + "px";
-            // dot.style.top = (projPos.y + can.getBoundingClientRect().top).toFixed(0) + "px";
-        }
-    }
     gInitialized = true;
     return scene;
 }
@@ -550,13 +301,13 @@ function startApplication(data) {
 
         engine = await asyncEngineCreation();
         if (!engine) throw 'engine should not be null.';
-        scene = createScene(data);
-        InitializeUniverse();
-        InitializeMenus();
+        InitializeUniverse(data);
+        InitializeMenus(data);
+        g3DScene = createScene(data);
         startRenderLoop(engine, canvas);
     };
     initFunction().then(() => {
-        scene.then(returnedScene => { sceneToRender = returnedScene; });
+        g3DScene.then(returnedScene => { sceneToRender = returnedScene; });
     });
 
     // window.initFunction();

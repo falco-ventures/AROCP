@@ -1,9 +1,9 @@
 var gUniverse = new Object();
-var gSystemMap = null;
+var gSystemMap = new Object();
 
-var g3DScene = null;
+var g3DScene;
 var gSelectedGalaxy = "";
-var SPSMesh = null;
+
 var toggler = document.getElementsByClassName("box");
 var i;
 var gScale = 1.0;
@@ -16,7 +16,7 @@ var gUniverseScale = 1.0;
 var gCurrentSystemIO = 0;
 
 var gSelectionName = "Jita";
-
+var gSelectedSystem = "Jita";
 var gSystems = new Object();
 
 var gUniverseMin = new Object();
@@ -46,7 +46,7 @@ function click_download() {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gSystemMap));
     var dlAnchorElem = document.getElementById('downloadAnchorElem');
     dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "scene.json");
+    dlAnchorElem.setAttribute("download", "g3DScene.json");
     dlAnchorElem.click();
 }
 
@@ -113,28 +113,28 @@ function AddSystemToSpace(space, system, systemType) {
     }
     system.systemType = systemType;
 
-    space[system.name] = system;
+    space.systems[system.name] = system;
     // space[system.name].position.x = space[system.name].position.x / metersPerAu ;
     // space[system.name].position.y = space[system.name].position.y / metersPerAu ;
     // space[system.name].position.z = space[system.name].position.z / metersPerAu ;
 
-    if (space[system.name].position.x < space.bbox.min.x) {
-        space.bbox.min.x = space[system.name].position.x;
+    if (space.systems[system.name].position.x < space.bbox.min.x) {
+        space.bbox.min.x = space.systems[system.name].position.x;
     }
-    if (space[system.name].position.y < space.bbox.min.y) {
-        space.bbox.min.y = space[system.name].position.y;
+    if (space.systems[system.name].position.y < space.bbox.min.y) {
+        space.bbox.min.y = space.systems[system.name].position.y;
     }
-    if (space[system.name].position.z < space.bbox.min.z) {
-        space.bbox.min.z = space[system.name].position.z;
+    if (space.systems[system.name].position.z < space.bbox.min.z) {
+        space.bbox.min.z = space.systems[system.name].position.z;
     }
-    if (space[system.name].position.x > space.bbox.max.x) {
-        space.bbox.max.x = space[system.name].position.x;
+    if (space.systems[system.name].position.x > space.bbox.max.x) {
+        space.bbox.max.x = space.systems[system.name].position.x;
     }
-    if (space[system.name].position.y > space.bbox.max.y) {
-        space.bbox.max.y = space[system.name].position.y;
+    if (space.systems[system.name].position.y > space.bbox.max.y) {
+        space.bbox.max.y = space.systems[system.name].position.y;
     }
-    if (space[system.name].position.z > space.bbox.max.z) {
-        space.bbox.max.z = space[system.name].position.z;
+    if (space.systems[system.name].position.z > space.bbox.max.z) {
+        space.bbox.max.z = space.systems[system.name].position.z;
     }
 }
 
@@ -182,7 +182,7 @@ function hover_callback() {
 function click_system_callback() {
     // console.log("click");
 
-    gSelectedSystem = "";
+    gSelectedSystem = "Jita";
     //hover_callback();
 
     var systemName = this.innerHTML.split(' (')[0];
@@ -210,35 +210,136 @@ function click_system_callback() {
         }
     }
 }
-function InitializeUniverse() {
+function InitializeUniverse(systems_json) {
 
     gUniverse.NewEden = new Object();
     gUniverse.NewEden.name = "New Eden";
-    gUniverse.NewEden.hisec = new Object();
-    gUniverse.NewEden.losec = new Object();
-    gUniverse.NewEden.nullsec = new Object();
+    gUniverse.NewEden.systems = new Object();
+    gUniverse.NewEden.pcs = new BABYLON.PointsCloudSystem("New Eden", 30, g3DScene);
+    // gUniverse.NewEden.hisec = new Object();
+    // gUniverse.NewEden.losec = new Object();
+    // gUniverse.NewEden.nullsec = new Object();
+
     gUniverse.WormholeSpace = new Object();
     gUniverse.WormholeSpace.name = "Wormhole Space";
+    gUniverse.WormholeSpace.systems = new Object();
+    gUniverse.WormholeSpace.pcs = new BABYLON.PointsCloudSystem("Wormhole Space", 30, g3DScene);
+
     gUniverse.ShatteredWormholeSpace = new Object();
     gUniverse.ShatteredWormholeSpace.name = "Shattered Wormhole Space";
+    gUniverse.ShatteredWormholeSpace.systems = new Object();
+    gUniverse.ShatteredWormholeSpace.pcs = new BABYLON.PointsCloudSystem("Shattered Wormhole Space", 30, g3DScene);
+
     gUniverse.VSpace = new Object();
     gUniverse.VSpace.name = "V Space";
+    gUniverse.VSpace.systems = new Object();
+    gUniverse.VSpace.pcs = new BABYLON.PointsCloudSystem("V Space", 30, g3DScene);
+
     gUniverse.ADSpace = new Object();
     gUniverse.ADSpace.name = "AD Space";
+    gUniverse.ADSpace.systems = new Object();
+    gUniverse.ADSpace.pcs = new BABYLON.PointsCloudSystem("AD Space", 30, g3DScene);
+
+
+    var keys = Object.keys(systems_json);
+    keys.sort();
+    for (var i = 0; i < keys.length; ++i) {
+
+        var system = keys[i];
+        var systemName = systems_json[system].name;
+
+        //Convert units
+        systems_json[system].position.x = systems_json[system].position.x / metersPerAu;
+        systems_json[system].position.y = systems_json[system].position.y / metersPerAu;
+        systems_json[system].position.z = systems_json[system].position.z / metersPerAu;
+
+
+        //Color
+        let security = systems_json[system].security_status;
+        var black = [0, 0, 0];
+        var purple = [1, 0, 1];
+        var blue = [0, 0, 1];
+        var cyan = [0, 1, 1];
+        var green = [0, 1, 0];
+        var yellow = [1, 1, 0];
+        var orange = [1, 0.5, 0];
+        var red = [1, 0.6, 0.6];
+        var darkRed = [1, 0.2, 0.2];
+        var color = black;
+        if (security <= 0.1) {
+            color = darkRed;
+        } else if (security <= 0.2) {
+            color = darkRed;
+        } else if (security <= 0.3) {
+            color = red;
+        } else if (red <= 0.4) {
+            color = red;
+        } else if (security <= 0.5) {
+            color = yellow;
+        } else if (security <= 0.6) {
+            color = cyan;
+        } else if (security <= 0.7) {
+            color = green;
+        } else {
+            color = blue;
+        }
+        systems_json[system].color = new BABYLON.Color3(color[0], color[1], color[2]);
+
+        //Add to system map
+        gSystemMap[systemName] = systems_json[system];
+    }
+
+    //Universe bounds
+    for (const system_name in systems_json) {
+        var position = systems_json[system_name].position;
+
+        if (gUniverseMax.x < position.x) {
+            gUniverseMax.x = position.x;
+        }
+        if (gUniverseMax.y < position.y) {
+            gUniverseMax.y = position.y;
+        }
+        if (gUniverseMax.z < position.z) {
+            gUniverseMax.z = position.z;
+        }
+
+        if (gUniverseMin.x > position.x) {
+            gUniverseMin.x = position.x;
+        }
+        if (gUniverseMin.y > position.y) {
+            gUniverseMin.y = position.y;
+        }
+        if (gUniverseMin.z > position.z) {
+            gUniverseMin.z = position.z;
+        }
+    }
+    var xSize = gUniverseMax.x - gUniverseMin.x;
+    var ySize = gUniverseMax.y - gUniverseMin.y;
+    var zSize = gUniverseMax.z - gUniverseMin.z;
+    var maxSize = xSize;
+    if (ySize > xSize) {
+        maxSize = ySize;
+    }
+    if (zSize > maxSize) {
+        maxSize = zSize;
+    }
+    gUniverseScale = maxSize;
 
 
     for (const system_name in gSystemMap) {
         var system = gSystemMap[system_name];
 
         if (system.system_id < 31000000) {
-            if (system.security_status <= 0.0) {
-                systemType = "nullsec";
-            } else if (system.security_status < 0.5) {
-                systemType = "losec";
-            } else {
-                systemType = "hisec";
-            }
-            AddSystemToSpace(gUniverse.NewEden[systemType], system, systemType);
+            // if (system.security_status <= 0.0) {
+            //     systemType = "nullsec";
+            // } else if (system.security_status < 0.5) {
+            //     systemType = "losec";
+            // } else {
+            //     systemType = "hisec";
+            // }
+            systemType = "NewEden";
+            AddSystemToSpace(gUniverse[systemType], system, systemType);
+
         }
         else if (system.system_id > 31000000 &&
             system.system_id < 32000000) {
@@ -263,7 +364,7 @@ function InitializeUniverse() {
         }
     }
 
-    gUniverse.NewEden.bbox = gUniverse.NewEden.nullsec.bbox;
+    // gUniverse.NewEden.bbox = gUniverse.NewEden.nullsec.bbox;
 }
 
 function InitializeMenus() {
