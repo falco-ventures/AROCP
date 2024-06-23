@@ -43,6 +43,9 @@ $code = $_GET['code'];
 $data = array("grant_type" => "authorization_code","code" => $code);                                                                    
 $data_string = json_encode($data);     
 $result = CurlSendPostRequest("https://login.eveonline.com/oauth/token", $data_string);
+
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
 echo $result;
 
 ?>
