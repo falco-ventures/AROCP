@@ -196,7 +196,9 @@ function InitializeUniverse() {
         }
         else if (system.system_id > 31000000 &&
             system.system_id < 32000000) {
-            if (system_name[1] == '0') {
+                if (system.system_id <= 31000006) {
+                    systemType = "ShatteredWormholeSpace"
+                } else if (system_name[1] == '0') {
                 systemType = "ShatteredWormholeSpace"
             } else {
                 systemType = "WormholeSpace";
