@@ -1,16 +1,8 @@
 <?php
 /*
-Template Name: Serve
+Eve Online character login
 */
 
-// $txt1 = "Learn PHP";
-// $txt2 = "W3Schools.com";
-
-// echo "<h2>$txt1</h2>";
-// echo "<p>Study PHP at $txt2</p>";
-
-
- 
 function CurlSendPostRequest($url,$request)
     {
         $authentication = base64_encode("5fe7b21736e748c6a78d9e4f98ff536e:5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU");
@@ -46,15 +38,9 @@ function CurlSendPostRequest($url,$request)
         return $data;
     }
 
-
-// From URL to get webpage contents.
 $code = $_GET['code'];
-// echo $code;
-
-// echo "<h2>$code</h2>";
 $data = array("grant_type" => "authorization_code","code" => $code);                                                                    
 $data_string = json_encode($data);     
-// echo $data_string;
 $result = CurlSendPostRequest("https://login.eveonline.com/oauth/token", $data_string);
 echo $result;
 
