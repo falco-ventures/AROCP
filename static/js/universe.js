@@ -117,10 +117,45 @@ function GetNextConstellation(data_i) {
     constellationIDs = Object.keys(gConstellations);
     var url = "https://esi.evetech.net/latest/universe/constellations/" + gConstellations[constellationIDs[gCurrentConstellationIO]].constellation_id + "/";
     if (gCurrentConstellationIO % 10 == 0) {
-        console.log("Getting " + gCurrentConstellationIO + " of " + constellationIDs.length );
+        console.log("Getting " + gCurrentConstellationIO + " of " + constellationIDs.length);
     }
     gCurrentConstellationIO++;
     setTimeout(() => { sendCommand(url, "datasource=tranquility&language=en", ProcessConstellation); }, 10);
+}
+
+
+
+function ProcessRegion(cData_i) {
+    var regionData = JSON.parse(cData_i.responseText);
+    if (regionData != null) {
+        gRegions[regionData.region_id] = regionData;
+        var regionIDs = Object.keys(gRegions);
+        if (gCurrentRegionIO < regionIDs.length) {
+            GetNextRegion();
+        } else {
+            download_json("regions.json", gRegions);
+        }
+
+    }
+
+}
+function GetNextRegion(data_i) {
+    var regionIDs = Object.keys(gRegions);
+
+    if (regionIDs == undefined || regionIDs.length == 0) {
+        var data = JSON.parse(data_i.responseText);
+        for (var i = 0; i < data.length; i++) {
+            gRegions[String(data[i])] = new Object();
+            gRegions[String(data[i])].region_id = String(data[i]);
+        }
+    }
+    regionIDs = Object.keys(gRegions);
+    var url = "https://esi.evetech.net/latest/universe/regions/" + gRegions[regionIDs[gCurrentRegionIO]].region_id + "/";
+    if (gCurrentRegionIO % 10 == 0) {
+        console.log("Getting " + gCurrentRegionIO + " of " + regionIDs.length);
+    }
+    gCurrentRegionIO++;
+    setTimeout(() => { sendCommand(url, "datasource=tranquility&language=en", ProcessRegion); }, 10);
 }
 function LoadSystemsJSON() {
     //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
@@ -129,30 +164,28 @@ function LoadSystemsJSON() {
             gConstellations = JSON.parse(text);
         } catch {
             gConstellations = new Object();
-            //https://esi.evetech.net/latest/universe/systems/?datasource=tranquility
             sendCommand("https://esi.evetech.net/latest/universe/constellations/", "datasource=tranquility", GetNextConstellation);
         }
-    })
-    // //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-    // loadExternalFile("regions.json", function (text) {
-    //     try {
-    //         gSystems = JSON.parse(text);
-    //         startApplication(gSystems);
-    //     } catch {
-    //         //https://esi.evetech.net/latest/universe/systems/?datasource=tranquility
-    //         sendCommand("https://esi.evetech.net/latest/universe/regions/", "datasource=tranquility", GetNextRegion);
-    //     }
-    // })
+        //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
+        loadExternalFile("regions.json", function (text) {
+            try {
+                gRegions = JSON.parse(text);
+            } catch {
+                gConstellations = new Object();
+                sendCommand("https://esi.evetech.net/latest/universe/regions/", "datasource=tranquility", GetNextRegion);
+            }
 
-    //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-    loadExternalFile("systems.json", function (text) {
-        try {
-            gSystems = JSON.parse(text);
-            startApplication(gSystems);
-        } catch {
-            //https://esi.evetech.net/latest/universe/systems/?datasource=tranquility
-            sendCommand("https://esi.evetech.net/latest/universe/systems/", "datasource=tranquility", GetNextSystem);
-        }
+            //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
+            loadExternalFile("systems.json", function (text) {
+                try {
+                    gSystems = JSON.parse(text);
+                    startApplication(gSystems);
+                } catch {
+                    //https://esi.evetech.net/latest/universe/systems/?datasource=tranquility
+                    sendCommand("https://esi.evetech.net/latest/universe/systems/", "datasource=tranquility", GetNextSystem);
+                }
+            })
+        })
     })
 
 }
@@ -215,7 +248,7 @@ function Get3DPositionFromSystem(system_data) {
     offsetPosition.x = system_data.position.x - space.bbox.center.x + space.offset.x;
     offsetPosition.y = system_data.position.y - space.bbox.center.y + space.offset.y;
     offsetPosition.z = system_data.position.z - space.bbox.center.z + space.offset.z;
-    return new BABYLON.Vector3(offsetPosition.x,offsetPosition.y,offsetPosition.z);
+    return new BABYLON.Vector3(offsetPosition.x, offsetPosition.y, offsetPosition.z);
 }
 
 function hover_system(systemName) {
@@ -239,15 +272,15 @@ function hover_system(systemName) {
         gHoverSphere.position = p1;
 
         gHoverPlane.position.x = gHoverSphere.position.x;
-        gHoverPlane.position.y = gHoverSphere.position.y+5.25;
+        gHoverPlane.position.y = gHoverSphere.position.y + 5.25;
         gHoverPlane.position.z = gHoverSphere.position.z;
 
         gHoverPlane.material.opacityTexture = gHoverPlaneTexture;
         gHoverPlane.material.diffuseTexture = gHoverPlaneTexture;
     } else {
-        if(gHoverPlane != undefined)
+        if (gHoverPlane != undefined)
             gHoverPlane.position.x = 100000;
-        if(gHoverSphere != undefined)
+        if (gHoverSphere != undefined)
             gHoverSphere.position.x = 100000;
     }
 }
@@ -262,7 +295,7 @@ function select_system(systemName) {
             gSelectionSphere.position = Get3DPositionFromSystem(gSystemMap[systemName]);
 
             gSelectionPlane.position.x = gSelectionSphere.position.x;
-            gSelectionPlane.position.y = gSelectionSphere.position.y+5.25;
+            gSelectionPlane.position.y = gSelectionSphere.position.y + 5.25;
             gSelectionPlane.position.z = gSelectionSphere.position.z;
 
             gCamera.position.x = gSelectionSphere.position.x;
@@ -283,7 +316,7 @@ function InitializeUniverse(systems_json) {
     gUniverse.NewEden = new Object();
     gUniverse.NewEden.name = "New Eden";
     gUniverse.NewEden.systems = new Object();
-    gUniverse.NewEden.offset ={x:0,y:0,z:0};
+    gUniverse.NewEden.offset = { x: 0, y: 0, z: 0 };
     gUniverse.NewEden.pcs = new BABYLON.PointsCloudSystem("New Eden", 30, g3DScene);
     // gUniverse.NewEden.hisec = new Object();
     // gUniverse.NewEden.losec = new Object();
@@ -292,25 +325,25 @@ function InitializeUniverse(systems_json) {
     gUniverse.WormholeSpace = new Object();
     gUniverse.WormholeSpace.name = "Wormhole Space";
     gUniverse.WormholeSpace.systems = new Object();
-    gUniverse.WormholeSpace.offset = {x:0,y:-40,z:0};
+    gUniverse.WormholeSpace.offset = { x: 0, y: -40, z: 0 };
     gUniverse.WormholeSpace.pcs = new BABYLON.PointsCloudSystem("Wormhole Space", 30, g3DScene);
 
     gUniverse.ShatteredWormholeSpace = new Object();
     gUniverse.ShatteredWormholeSpace.name = "Shattered Wormhole Space";
     gUniverse.ShatteredWormholeSpace.systems = new Object();
-    gUniverse.ShatteredWormholeSpace.offset = {x:0,y:-20,z:0};
+    gUniverse.ShatteredWormholeSpace.offset = { x: 0, y: -20, z: 0 };
     gUniverse.ShatteredWormholeSpace.pcs = new BABYLON.PointsCloudSystem("Shattered Wormhole Space", 30, g3DScene);
 
     gUniverse.VSpace = new Object();
     gUniverse.VSpace.name = "V Space";
     gUniverse.VSpace.systems = new Object();
-    gUniverse.VSpace.offset = {x:0,y:0,z:0};
+    gUniverse.VSpace.offset = { x: 0, y: 0, z: 0 };
     gUniverse.VSpace.pcs = new BABYLON.PointsCloudSystem("V Space", 30, g3DScene);
 
     gUniverse.ADSpace = new Object();
     gUniverse.ADSpace.name = "AD Space";
     gUniverse.ADSpace.systems = new Object();
-    gUniverse.ADSpace.offset = {x:0,y:0,z:0};
+    gUniverse.ADSpace.offset = { x: 0, y: 0, z: 0 };
     gUniverse.ADSpace.pcs = new BABYLON.PointsCloudSystem("AD Space", 30, g3DScene);
 
 
@@ -355,7 +388,7 @@ function InitializeUniverse(systems_json) {
             color = blue;
         }
         systems_json[system].color = new BABYLON.Color3(color[0], color[1], color[2]);
-        
+
         //Add to system map
         gSystemMap[systemName] = systems_json[system];
     }
@@ -398,7 +431,7 @@ function InitializeUniverse(systems_json) {
 
     var purple = [1, 0, 1];
     var orange = [1, 0.5, 0];
-    var gray = [0.5,0.5,0.5];
+    var gray = [0.5, 0.5, 0.5];
     var color;
     for (const system_name in gSystemMap) {
         var system = gSystemMap[system_name];
@@ -450,9 +483,9 @@ function InitializeUniverse(systems_json) {
 
     for (const space_name in gUniverse) {
         gUniverse[space_name].bbox.center = new Object();
-        gUniverse[space_name].bbox.center.x = (gUniverse[space_name].bbox.min.x + gUniverse[space_name].bbox.max.x)/2;
-        gUniverse[space_name].bbox.center.y = (gUniverse[space_name].bbox.min.y + gUniverse[space_name].bbox.max.y)/2;
-        gUniverse[space_name].bbox.center.z = (gUniverse[space_name].bbox.min.z + gUniverse[space_name].bbox.max.z)/2;
+        gUniverse[space_name].bbox.center.x = (gUniverse[space_name].bbox.min.x + gUniverse[space_name].bbox.max.x) / 2;
+        gUniverse[space_name].bbox.center.y = (gUniverse[space_name].bbox.min.y + gUniverse[space_name].bbox.max.y) / 2;
+        gUniverse[space_name].bbox.center.z = (gUniverse[space_name].bbox.min.z + gUniverse[space_name].bbox.max.z) / 2;
     }
 }
 
