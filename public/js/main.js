@@ -94,16 +94,16 @@ function sendCommand(commandName, paramString, callback, command_type, headers, 
 
 function verification_callback(data, loginCredentials) {
     if (data != undefined) {
-        console.log("Requested  and got " + data.responseText);
 
         // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
-        /*
-        {"CharacterID":95465499,"CharacterName":"CCP Bartender","ExpiresOn":"2017-07-05T14:34:16.5857101","Scopes":"esi-characters.read_standings.v1","TokenType":"Character","CharacterOwnerHash":"lots_of_letters_and_numbers","IntellectualProperty":"EVE"}
-
-*/
+        
         try {
             var characterInfo = JSON.parse(data.responseText);
-            alert("Welcome " + characterInfo.CharacterName + " ID: " + characterInfo.CharacterID)
+
+            characterInfo.refresh_token = loginCredentials.refresh_token;
+            alert("Welcome " + characterInfo.CharacterName + " ID: " + characterInfo.CharacterID);
+            console.log(JSON.stringify(characterInfo));
+            AddCharacter(characterInfo);
         } catch (e) {
 
         }
