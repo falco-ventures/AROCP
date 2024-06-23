@@ -75,8 +75,8 @@ $data = array("grant_type" => "authorization_code","code" => $code);
 $data_string = json_encode($data);     
 $result_string = CurlSendPostRequest("https://login.eveonline.com/oauth/token", $data_string);                                                      
 $result = json_encode($result_string);     
-
-$headers = array("Authorization" => "Bearer $result['code']" );                                                                    
+$bearer =  $result['code'];
+$headers = array("Authorization" => "Bearer $bearer" );                                                                    
 $headers_string = json_encode($headers);     
 $get_result = CurlSendGetRequest("https://esi.evetech.net/verify", $result['access_token'], );
                                                    
