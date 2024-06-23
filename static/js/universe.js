@@ -142,9 +142,9 @@ function AddSystemToSpace(space, system, systemType) {
     system.systemType = systemType;
 
     space[system.name] = system;
-    space[system.name].position.x = space[system.name].position.x / metersPerAu;
-    space[system.name].position.y = space[system.name].position.y / metersPerAu;
-    space[system.name].position.z = space[system.name].position.z / metersPerAu;
+    space[system.name].position.x = space[system.name].position.x ;
+    space[system.name].position.y = space[system.name].position.y ;
+    space[system.name].position.z = space[system.name].position.z ;
     if (space[system.name].position.x < space.bbox.min.x) {
         space.bbox.min.x = space[system.name].position.x;
     }
@@ -223,9 +223,9 @@ function InitializeMenus() {
     for (const system_name in gSystemMap) {
         var system = gSystemMap[system_name];
         var itemText = system.name
-            + " (" + system.position.x.toFixed(2)
-            + "," + system.position.y.toFixed(2)
-            + "," + system.position.z.toFixed(2)
+            + " (" + (system.position.x/metersPerAu).toFixed(2)
+            + "," + (system.position.y/metersPerAu).toFixed(2)
+            + "," +(system.position.z/metersPerAu).toFixed(2)
             + ")";
         AddMenuItem(system.systemType, itemText);
     }
@@ -235,13 +235,13 @@ function InitializeMenus() {
 
 
         var itemText = gUniverse[space_name].name
-            + " (" + gUniverse[space_name].bbox.min.x.toFixed(2)
-            + "," + gUniverse[space_name].bbox.min.y.toFixed(2)
-            + "," + gUniverse[space_name].bbox.min.z.toFixed(2)
+            + " (" + (gUniverse[space_name].bbox.min.x/metersPerAu).toFixed(2)
+            + "," + (gUniverse[space_name].bbox.min.y/metersPerAu).toFixed(2)
+            + "," + (gUniverse[space_name].bbox.min.z/metersPerAu).toFixed(2)
             + ") - "
-            + " (" + gUniverse[space_name].bbox.max.x.toFixed(2)
-            + "," + gUniverse[space_name].bbox.max.y.toFixed(2)
-            + "," + gUniverse[space_name].bbox.max.z.toFixed(2)
+            + " (" + (gUniverse[space_name].bbox.max.x/metersPerAu).toFixed(2)
+            + "," + (gUniverse[space_name].bbox.max.y/metersPerAu).toFixed(2)
+            + "," + (gUniverse[space_name].bbox.max.z/metersPerAu).toFixed(2)
             + ")";
 
         menuItem.innerHTML = itemText;

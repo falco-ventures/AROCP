@@ -106,7 +106,7 @@ function hover_callback() {
         var dx = (galaxyData.position.x - selectedGalaxyData.position.x);
         var dy = (galaxyData.position.y - selectedGalaxyData.position.y);
         var dz = (galaxyData.position.z - selectedGalaxyData.position.z);
-        var distance = Math.sqrt(dx * dx + dy * dy + dz * dz) / metersPerAu;
+        var distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
         label = galaxyName + " " + distance + " from " + selectedGalaxyData.name;
     }
     gHoverPlaneTexture.clear();
