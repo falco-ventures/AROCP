@@ -325,13 +325,13 @@ function InitializeUniverse(systems_json) {
     gUniverse.WormholeSpace = new Object();
     gUniverse.WormholeSpace.name = "Wormhole Space";
     gUniverse.WormholeSpace.systems = new Object();
-    gUniverse.WormholeSpace.offset = { x: 0, y: -40, z: 0 };
+    gUniverse.WormholeSpace.offset = { x: 0, y: 0, z: 0 };
     gUniverse.WormholeSpace.pcs = new BABYLON.PointsCloudSystem("Wormhole Space", 30, g3DScene);
 
     gUniverse.ShatteredWormholeSpace = new Object();
     gUniverse.ShatteredWormholeSpace.name = "Shattered Wormhole Space";
     gUniverse.ShatteredWormholeSpace.systems = new Object();
-    gUniverse.ShatteredWormholeSpace.offset = { x: 0, y: -20, z: 0 };
+    gUniverse.ShatteredWormholeSpace.offset = { x: 0, y: 30, z: 0 };
     gUniverse.ShatteredWormholeSpace.pcs = new BABYLON.PointsCloudSystem("Shattered Wormhole Space", 30, g3DScene);
 
     gUniverse.VSpace = new Object();
@@ -346,8 +346,53 @@ function InitializeUniverse(systems_json) {
     gUniverse.ADSpace.offset = { x: 0, y: 0, z: 0 };
     gUniverse.ADSpace.pcs = new BABYLON.PointsCloudSystem("AD Space", 30, g3DScene);
 
+    //Add regions to spaces
+    var keys = Object.keys(gRegions);
+    keys.sort();
+    for (var i = 0; i < keys.length; ++i) {
+        var region = gRegions[keys[i]];
+        if(region.region_id < 11000000) {
+            //new eden
+            region.space = "NewEden";
+            gUniverse.NewEden[region.name] = region;
+        } else if(region.region_id < 11000031) {
+            //wormhole
+            region.space = "WormholeSpace";
+            gUniverse.WormholeSpace[region.name] = region;
+        } else if(region.region_id < 12000000) {
+            //shattered wormhole
+            region.space = "ShatteredWormholeSpace";
+            gUniverse.ShatteredWormholeSpace[region.name] = region;
+        }else if(region.region_id < 14000000) {
+            //AD
+            region.space = "ADSpace";
+            gUniverse.ADSpace[region.name] = region;
+        } else {
+            //V
+            region.space = "VSpace";
+            gUniverse.VSpace[region.name] = region;
+        }
+    }
 
-    var keys = Object.keys(systems_json);
+    //Add regions to spaces
+    keys = Object.keys(gConstellations);
+    keys.sort();
+    for (var i = 0; i < keys.length; ++i) {
+        var constellation = gConstellations[keys[i]];
+
+        constellation.position.x = constellation.position.x / metersPerAu;
+        constellation.position.y = constellation.position.y / metersPerAu;
+        constellation.position.z = constellation.position.z / metersPerAu;
+
+        gConstellations[keys[i]] = constellation;
+        var region = gRegions[constellation.region_id];
+        var space = region.space;
+        gUniverse[space][region.name][keys[i]] = constellation;
+        
+    }
+
+
+    keys = Object.keys(systems_json);
     keys.sort();
     for (var i = 0; i < keys.length; ++i) {
 
@@ -448,16 +493,13 @@ function InitializeUniverse(systems_json) {
             AddSystemToSpace(gUniverse[systemType], system, systemType);
 
         }
-        else if (system.system_id > 31000000 &&
-            system.system_id < 32000000) {
-            if (system.system_id <= 31000006) {
-                systemType = "ShatteredWormholeSpace"
-                color = orange;
-            } else if (system_name[1] == '0') {
-                systemType = "ShatteredWormholeSpace"
+        else if (system.system_id > 31000000 && system.system_id < 32000000) {
+            var constellation= gConstellations[system.constellation_id];
+            var region = gRegions[constellation.region_id];
+            systemType = region.space;
+            if (systemType == "ShatteredWormholeSpace") {
                 color = orange;
             } else {
-                systemType = "WormholeSpace";
                 color = purple;
             }
             system.color = new BABYLON.Color3(color[0], color[1], color[2]);
@@ -489,7 +531,27 @@ function InitializeUniverse(systems_json) {
     }
 }
 
+
+
 function InitializeMenus() {
+
+
+    for (const region_name in gRegions) {
+        var region = gRegions[region_name];
+        var itemText = region.name;
+        AddRegionMenu(region.space, region.name, itemText);
+    }
+
+    for (const c_name in gConstellations) {
+        var constellation = gConstellations[c_name];
+        var itemText = constellation.name
+            + " (" + (constellation.position.x).toFixed(2)
+            + "," + (constellation.position.y).toFixed(2)
+            + "," + (constellation.position.z).toFixed(2)
+            + ")";
+        var region = gRegions[constellation.region_id];
+        AddConstellationMenu(region.name, constellation.name, itemText);
+    }
 
     for (const system_name in gSystemMap) {
         var system = gSystemMap[system_name];
@@ -498,25 +560,26 @@ function InitializeMenus() {
             + "," + (system.position.y).toFixed(2)
             + "," + (system.position.z).toFixed(2)
             + ")";
-        AddMenuItem(system.systemType, itemText);
+        var constellation = gConstellations[system.constellation_id];
+        AddMenuItem(constellation.name, itemText);
     }
 
-    for (const space_name in gUniverse) {
-        var menuItem = document.getElementById(space_name + "UL");
+    // for (const space_name in gUniverse) {
+    //     var menuItem = document.getElementById(space_name + "UL");
 
 
-        var itemText = gUniverse[space_name].name
-            + " (" + (gUniverse[space_name].bbox.min.x).toFixed(2)
-            + "," + (gUniverse[space_name].bbox.min.y).toFixed(2)
-            + "," + (gUniverse[space_name].bbox.min.z).toFixed(2)
-            + ") - "
-            + " (" + (gUniverse[space_name].bbox.max.x).toFixed(2)
-            + "," + (gUniverse[space_name].bbox.max.y).toFixed(2)
-            + "," + (gUniverse[space_name].bbox.max.z).toFixed(2)
-            + ")";
+    //     var itemText = gUniverse[space_name].name
+    //         + " (" + (gUniverse[space_name].bbox.min.x).toFixed(2)
+    //         + "," + (gUniverse[space_name].bbox.min.y).toFixed(2)
+    //         + "," + (gUniverse[space_name].bbox.min.z).toFixed(2)
+    //         + ") - "
+    //         + " (" + (gUniverse[space_name].bbox.max.x).toFixed(2)
+    //         + "," + (gUniverse[space_name].bbox.max.y).toFixed(2)
+    //         + "," + (gUniverse[space_name].bbox.max.z).toFixed(2)
+    //         + ")";
 
-        menuItem.innerHTML = itemText;
-    }
+    //     menuItem.innerHTML = itemText;
+    // }
 
     /*
     list clicking
@@ -538,8 +601,63 @@ function AddMenuItem(parentMenuID, itemText) {
     var ul = document.getElementById(parentMenuID);
     var li = document.createElement("li");
     var textNode = document.createTextNode(itemText);
+    textNode.class = "box"
     li.appendChild(textNode);
     li.addEventListener("mouseover", hover_callback);
     li.addEventListener("mousedown", click_system_callback);
+    ul.appendChild(li);
+}
+
+
+function AddRegionMenu(parentMenuID, region_name, itemText) {
+    var ul = document.getElementById(parentMenuID);
+   
+    var li = document.createElement("li");
+    var span = document.createElement("span");
+
+    span.class = "box";
+    span.id = region_name+"UL";
+    span.innerHTML = itemText;
+    li.appendChild(span);
+
+    var newul = document.createElement("ul");
+    newul.class = "nested";
+    newul.id = region_name;
+    li.appendChild(newul);
+    
+    li.addEventListener("click", function () {
+        this.parentElement.querySelector("nested").classList.toggle("active");
+        this.classList.toggle("check-box");
+
+
+
+    });
+    ul.appendChild(li);
+}
+
+
+function AddConstellationMenu(parentMenuID, c_name, itemText) {
+    var ul = document.getElementById(parentMenuID);
+   
+    var li = document.createElement("li");
+    var span = document.createElement("span");
+
+    span.class = "box";
+    span.id = c_name+"UL";
+    span.innerHTML = itemText;
+    li.appendChild(span);
+
+    var newul = document.createElement("ul");
+    newul.class = "nested";
+    newul.id = c_name;
+    li.appendChild(newul);
+    
+    li.addEventListener("click", function () {
+        this.parentElement.querySelector("nested").classList.toggle("active");
+        this.classList.toggle("check-box");
+
+
+
+    });
     ul.appendChild(li);
 }
