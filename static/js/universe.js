@@ -180,11 +180,11 @@ function hover_callback() {
 }
 function Get3DPositionFromSystem(system_data) {
     var space = gUniverse[system_data.systemType];
-    var offsetPosition = system_data.position;
-    offsetPosition.x -= space.bbox.center.x;
-    offsetPosition.y -= space.bbox.center.y;
-    offsetPosition.z -= space.bbox.center.z;
-    return system_data.position;
+    var offsetPosition = new Object();
+    offsetPosition.x = system_data.position.x - space.bbox.center.x + space.offset.x;
+    offsetPosition.y = system_data.position.y - space.bbox.center.y + space.offset.y;
+    offsetPosition.z = system_data.position.z - space.bbox.center.z + space.offset.z;
+    return offsetPosition;
 }
 function click_system_callback() {
     // console.log("click");
@@ -220,6 +220,7 @@ function InitializeUniverse(systems_json) {
     gUniverse.NewEden = new Object();
     gUniverse.NewEden.name = "New Eden";
     gUniverse.NewEden.systems = new Object();
+    gUniverse.NewEden.offset ={x:0,y:0,z:0};
     gUniverse.NewEden.pcs = new BABYLON.PointsCloudSystem("New Eden", 30, g3DScene);
     // gUniverse.NewEden.hisec = new Object();
     // gUniverse.NewEden.losec = new Object();
@@ -228,21 +229,25 @@ function InitializeUniverse(systems_json) {
     gUniverse.WormholeSpace = new Object();
     gUniverse.WormholeSpace.name = "Wormhole Space";
     gUniverse.WormholeSpace.systems = new Object();
+    gUniverse.WormholeSpace.offset = {x:0,y:-40,z:0};
     gUniverse.WormholeSpace.pcs = new BABYLON.PointsCloudSystem("Wormhole Space", 30, g3DScene);
 
     gUniverse.ShatteredWormholeSpace = new Object();
     gUniverse.ShatteredWormholeSpace.name = "Shattered Wormhole Space";
     gUniverse.ShatteredWormholeSpace.systems = new Object();
+    gUniverse.ShatteredWormholeSpace.offset = {x:0,y:-20,z:0};
     gUniverse.ShatteredWormholeSpace.pcs = new BABYLON.PointsCloudSystem("Shattered Wormhole Space", 30, g3DScene);
 
     gUniverse.VSpace = new Object();
     gUniverse.VSpace.name = "V Space";
     gUniverse.VSpace.systems = new Object();
+    gUniverse.VSpace.offset = {x:0,y:0,z:0};
     gUniverse.VSpace.pcs = new BABYLON.PointsCloudSystem("V Space", 30, g3DScene);
 
     gUniverse.ADSpace = new Object();
     gUniverse.ADSpace.name = "AD Space";
     gUniverse.ADSpace.systems = new Object();
+    gUniverse.ADSpace.offset = {x:0,y:0,z:0};
     gUniverse.ADSpace.pcs = new BABYLON.PointsCloudSystem("AD Space", 30, g3DScene);
 
 
