@@ -38,13 +38,25 @@ function create_selection_sphere(name) {
         gSelectionSphere.dispose();
         gSelectionPlane.dispose();
     }
-    var sphere = BABYLON.MeshBuilder.CreateSphere("SelectionSphere", { diameter: 0.5, segments: 32 }, sceneToRender);
+    var sphere = BABYLON.MeshBuilder.CreateSphere("SelectionSphere", { diameter: 0.5, segments: 32 }, Get3DScene());
+
+    sphere.material = new BABYLON.StandardMaterial("SphereMaterial", Get3DScene());
+    sphere.material.backFaceCulling = false;
+    sphere.material.disableLighting = true;
+    sphere.material.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    
     var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 20, height: 10 }, Get3DScene());
     var planeMaterial = new BABYLON.StandardMaterial("SelectionMaterial", Get3DScene());
     var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("SelectionTexture", { width: 512, height: 256 }, Get3DScene());
     planeTexture.getContext();
     planeTexture.hasAlpha = true;
-    planeTexture.drawText(name, 0, 200, "bold 44px Arial", "white", "transparent", true, true);
+    
+    var ctx = planeTexture.getContext();
+    ctx.font = "bold 44px Arial";
+    const textWidth = ctx.measureText(name).width;
+    var x = (512 - textWidth)/2;
+
+    planeTexture.drawText(name, x, 256, "bold 44px Arial", "white", "transparent", true, true);
 
     planeMaterial.backFaceCulling = false;
     planeMaterial.disableLighting = true;
@@ -65,21 +77,26 @@ function create_selection_sphere(name) {
 
 function create_hover_sphere(name) {
     var sphere = BABYLON.MeshBuilder.CreateSphere("HoverSphere", { diameter: 0.5, segments: 32 }, Get3DScene());
-    sphere.isPickable = false;
-    var sphereMaterial = new BABYLON.StandardMaterial("SphereMaterial", Get3DScene());
-    sphereMaterial.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-    sphere.material = sphereMaterial
+    // sphere.isPickable = false;
+    
+    sphere.material = new BABYLON.StandardMaterial("SphereMaterial2", Get3DScene());
+    sphere.material.backFaceCulling = false;
+    sphere.material.disableLighting = true;
+    sphere.material.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
 
 
     var plane = BABYLON.MeshBuilder.CreatePlane("HoverPlane", { width: 20, height: 10 }, Get3DScene());
     plane.isPickable = false;
     var planeMaterial = new BABYLON.StandardMaterial("HoverMaterial", Get3DScene());
     var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("HoverTexture", { width: 512, height: 256 }, Get3DScene());
-    planeTexture.getContext();
+    ;
     planeTexture.hasAlpha = true;
     var label = name;
-
-    planeTexture.drawText(label, 0, 200, "bold 44px Arial", "white", "transparent", true, true);
+    var ctx = planeTexture.getContext();
+    ctx.font = "bold 44px Arial";
+    const textWidth = ctx.measureText(label).width;
+    var x = (512 - textWidth)/2;
+    planeTexture.drawText(label, x, 256, "bold 44px Arial", "white", "transparent", true, true);
 
     planeMaterial.backFaceCulling = false;
     planeMaterial.disableLighting = true;

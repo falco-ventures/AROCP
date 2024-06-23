@@ -148,6 +148,19 @@ function click_space_callback() {
     var spaceName = this.innerHTML;
     console.log("click_space_callback " + spaceName);
 }
+function hover_callback() {
+    var systemName = this.innerHTML.split(' (')[0];
+    hover_system(systemName)
+}
+function Get3DPositionFromSystem(system_data) {
+    var space = gUniverse[system_data.systemType];
+    var offsetPosition = new Object();
+    offsetPosition.x = system_data.position.x - space.bbox.center.x + space.offset.x;
+    offsetPosition.y = system_data.position.y - space.bbox.center.y + space.offset.y;
+    offsetPosition.z = system_data.position.z - space.bbox.center.z + space.offset.z;
+    return new BABYLON.Vector3(offsetPosition.x,offsetPosition.y,offsetPosition.z);
+}
+
 function hover_system(systemName) {
     var systemData = gSystemMap[systemName];
     if (systemData != undefined) {
@@ -165,11 +178,11 @@ function hover_system(systemName) {
         }
 
         gHoverPlaneTexture.clear();
-        gHoverPlaneTexture.drawText(label, 0, 54, "bold 44px Arial", "white", "transparent", true, true);
+        gHoverPlaneTexture.drawText(label, 0, 200, "bold 44px Arial", "white", "transparent", true, true);
         gHoverSphere.position = p1;
 
         gHoverPlane.position.x = gHoverSphere.position.x;
-        gHoverPlane.position.y = gHoverSphere.position.y+1;
+        gHoverPlane.position.y = gHoverSphere.position.y+5.25;
         gHoverPlane.position.z = gHoverSphere.position.z;
 
         gHoverPlane.material.opacityTexture = gHoverPlaneTexture;
@@ -181,19 +194,6 @@ function hover_system(systemName) {
             gHoverSphere.position.x = 100000;
     }
 }
-function hover_callback() {
-    var systemName = this.innerHTML.split(' (')[0];
-    hover_system(systemName)
-}
-function Get3DPositionFromSystem(system_data) {
-    var space = gUniverse[system_data.systemType];
-    var offsetPosition = new Object();
-    offsetPosition.x = system_data.position.x - space.bbox.center.x + space.offset.x;
-    offsetPosition.y = system_data.position.y - space.bbox.center.y + space.offset.y;
-    offsetPosition.z = system_data.position.z - space.bbox.center.z + space.offset.z;
-    return offsetPosition;
-}
-
 function select_system(systemName) {
     if (gSystemMap[systemName] != undefined) {
         var systemData = gSystemMap[systemName];
@@ -205,7 +205,7 @@ function select_system(systemName) {
             gSelectionSphere.position = Get3DPositionFromSystem(gSystemMap[systemName]);
 
             gSelectionPlane.position.x = gSelectionSphere.position.x;
-            gSelectionPlane.position.y = gSelectionSphere.position.y+1;
+            gSelectionPlane.position.y = gSelectionSphere.position.y+5.25;
             gSelectionPlane.position.z = gSelectionSphere.position.z;
 
             gCamera.position.x = gSelectionSphere.position.x;
