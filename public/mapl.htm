@@ -176,7 +176,7 @@
     </div>
     <script>
 
-        var gUniverse = null;
+        var gSystemMap = null;
         var g3DScene;
         var gHoverPlaneTexture;
         var gHoverSphere;
@@ -315,7 +315,7 @@
 
         function hover_callback() {
             var galaxyName = this.innerHTML;
-            var galaxyData = gUniverse[galaxyName];
+            var galaxyData = gSystemMap[galaxyName];
             gHoverPlaneTexture.clear();
             gHoverPlaneTexture.drawText(galaxyData.name, 0, 54, "bold 44px Arial", "white", "transparent", true, true);
             gHoverSphere.position.x = gScale * galaxyData.position.x;
@@ -337,7 +337,7 @@
             //hover_callback();
 
             var galaxyName = this.innerHTML;
-            var galaxyData = gUniverse[galaxyName];
+            var galaxyData = gSystemMap[galaxyName];
             gSelectedGalaxy = galaxyName;
 
             // gSelectionPlaneTexture.drawText(galaxyData.x, 0, 100, "bold 44px Arial", "white", "black", true, true);
@@ -377,7 +377,7 @@
             // console.log(pickResult)
         }
         function click_download() {
-            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gUniverse));
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gSystemMap));
                 var dlAnchorElem = document.getElementById('downloadAnchorElem');
                 dlAnchorElem.setAttribute("href", dataStr);
                 dlAnchorElem.setAttribute("download", "scene.json");
@@ -387,7 +387,7 @@
             console.log("click_galaxy_callback");
             var galaxyName = this.innerHTML;
             if (galaxyName == "Universe") {
-                var galaxyData = gUniverse[galaxyName];
+                var galaxyData = gSystemMap[galaxyName];
                 gCamera.position.x = 0;//gScale*galaxyData[1];
                 gCamera.position.y = 0;//gScale*galaxyData[2];
                 gCamera.position.z = -150;//gScale*galaxyData[3]-3;
@@ -423,7 +423,7 @@
             // }
 
 
-            gUniverse = new Object();
+            gSystemMap = new Object();
             if (sceneToRender != null)
                 return null;
             var scene = new BABYLON.Scene(engine);
@@ -507,7 +507,7 @@
                 // if(galaxyName == undefined || !galaxyName.includes("NGC"))
                 //      continue;
 
-                gUniverse[galaxyName] = universe[galaxy];
+                gSystemMap[galaxyName] = universe[galaxy];
                 let x = gScale * universe[galaxy].position.x;
                 let y = gScale * universe[galaxy].position.y;
                 let z = gScale * universe[galaxy].position.z;
@@ -556,7 +556,7 @@
                 }
                 var systemType = "unknown";
 
-                if (gUniverse[galaxyName].system_id < 31000000) {
+                if (gSystemMap[galaxyName].system_id < 31000000) {
 
                     if (security <= 0.0) {
                         systemType = "nullsec";
@@ -566,20 +566,20 @@
                         systemType = "hisec";
                     }
                 }
-                else if (gUniverse[galaxyName].system_id > 31000000 &&
-                    gUniverse[galaxyName].system_id < 32000000) {
+                else if (gSystemMap[galaxyName].system_id > 31000000 &&
+                    gSystemMap[galaxyName].system_id < 32000000) {
                     if (galaxyName[1] == '0') {
                         systemType = "shatteredwormhole"
                     } else {
                         systemType = "wormhole";
                     }
                 }
-                else if (gUniverse[galaxyName].system_id > 32000000 &&
-                    gUniverse[galaxyName].system_id < 33000000) {
+                else if (gSystemMap[galaxyName].system_id > 32000000 &&
+                    gSystemMap[galaxyName].system_id < 33000000) {
                     systemType = "adspace";
                 }
-                else if (gUniverse[galaxyName].system_id > 34000000 &&
-                    gUniverse[galaxyName].system_id < 35000000) {
+                else if (gSystemMap[galaxyName].system_id > 34000000 &&
+                    gSystemMap[galaxyName].system_id < 35000000) {
                     systemType = "vspace";
                 }
 
@@ -622,7 +622,7 @@
                     li.addEventListener("mousedown", click_callback);
                     ul.appendChild(li);
                 }
-                // if (gUniverse[galaxyName].system_id < 31000000) {
+                // if (gSystemMap[galaxyName].system_id < 31000000) {
                     positions.push(new BABYLON.Vector3(x, y, z));
                     sizes.push(new BABYLON.Vector3(magnitude, magnitude, magnitude));
 

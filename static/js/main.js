@@ -194,7 +194,7 @@ function main() {
     parse_my_url();
     download_character_info();
 
-    InitializeUniverse();
+    LoadSystemsJSON();
 }
 
 main();

@@ -97,11 +97,11 @@ function create_hover_sphere(name) {
 }
 
 function hover_callback() {
-    var galaxyName = this.innerHTML;
-    var galaxyData = gUniverse[galaxyName];
+    var galaxyName = this.innerHTML.split(' (')[0];
+    var galaxyData = gSystemMap[galaxyName];
     var label = galaxyName;
-    var selectedGalaxyData = gUniverse[gSelectedGalaxy];
-    // gUniverseScale = gJitaCenter[0] / (gUniverse["Jita"].position.x);
+    var selectedGalaxyData = gSystemMap[gSelectedGalaxy];
+    // gUniverseScale = gJitaCenter[0] / (gSystemMap["Jita"].position.x);
     if (galaxyData != undefined && selectedGalaxyData != undefined) {
         var dx = (galaxyData.position.x - selectedGalaxyData.position.x);
         var dy = (galaxyData.position.y - selectedGalaxyData.position.y);
@@ -129,8 +129,8 @@ function click_callback() {
     gSelectedGalaxy = "";
     //hover_callback();
 
-    var galaxyName = this.innerHTML;
-    var galaxyData = gUniverse[galaxyName];
+    var galaxyName = this.innerHTML.split(' (')[0];
+    var galaxyData = gSystemMap[galaxyName];
     gSelectedGalaxy = galaxyName;
 
     create_selection_sphere(galaxyName);
@@ -195,7 +195,7 @@ var createScene = async function (universe) {
     //     return;
     // }
 
-    gUniverse = new Object();
+    gSystemMap = new Object();
     if (sceneToRender != null)
         return null;
     var scene = new BABYLON.Scene(engine);
@@ -280,7 +280,7 @@ var createScene = async function (universe) {
         // if(galaxyName == undefined || !galaxyName.includes("NGC"))
         //      continue;
 
-        universe[galaxyName] = universe[galaxy];
+        gSystemMap[galaxyName] = universe[galaxy];
         let x = gScale * universe[galaxy].position.x;
         let y = gScale * universe[galaxy].position.y;
         let z = gScale * universe[galaxy].position.z;
@@ -329,7 +329,7 @@ var createScene = async function (universe) {
         }
         var systemType = "unknown";
 
-        if (universe[galaxyName].system_id < 31000000) {
+        if (universe[galaxy].system_id < 31000000) {
 
             if (security <= 0.0) {
                 systemType = "nullsec";
@@ -339,20 +339,20 @@ var createScene = async function (universe) {
                 systemType = "hisec";
             }
         }
-        else if (universe[galaxyName].system_id > 31000000 &&
-            universe[galaxyName].system_id < 32000000) {
+        else if (universe[galaxy].system_id > 31000000 &&
+            universe[galaxy].system_id < 32000000) {
             if (galaxyName[1] == '0') {
                 systemType = "shatteredwormhole"
             } else {
                 systemType = "wormhole";
             }
         }
-        else if (universe[galaxyName].system_id > 32000000 &&
-            universe[galaxyName].system_id < 33000000) {
+        else if (universe[galaxy].system_id > 32000000 &&
+            universe[galaxy].system_id < 33000000) {
             systemType = "adspace";
         }
-        else if (universe[galaxyName].system_id > 34000000 &&
-            universe[galaxyName].system_id < 35000000) {
+        else if (universe[galaxy].system_id > 34000000 &&
+            universe[galaxy].system_id < 35000000) {
             systemType = "vspace";
         }
 
@@ -384,17 +384,8 @@ var createScene = async function (universe) {
         if (octant) {
             bands[band][octant - 1] = universe[galaxy];
         }
-        if (document.getElementById(universe[galaxy].name) == null) {
-            var range = band + 1;
-            var elementID = systemType;
-            var ul = document.getElementById(elementID);
-            var li = document.createElement("li");
-            var textNode = document.createTextNode(universe[galaxy].name);
-            li.appendChild(textNode);
-            li.addEventListener("mouseover", hover_callback);
-            li.addEventListener("mousedown", click_callback);
-            ul.appendChild(li);
-        }
+
+        
         // if (universe[galaxyName].system_id < 31000000) {
         positions.push(new BABYLON.Vector3(x, y, z));
         sizes.push(new BABYLON.Vector3(magnitude, magnitude, magnitude));
@@ -526,7 +517,6 @@ var createScene = async function (universe) {
         }
     }
     gInitialized = true;
-    gUniverse = universe;
     return scene;
 }
 
@@ -600,9 +590,12 @@ function startApplication(data) {
                 return createDefaultEngine();
             }
         }
+        
         engine= await asyncEngineCreation();
         if (!engine) throw 'engine should not be null.';
         scene = createScene(data);
+        InitializeUniverse();
+        InitializeMenus();
         startRenderLoop(engine, canvas);
     };
     initFunction().then(() => {

@@ -1,5 +1,5 @@
-
-var gUniverse = null;
+var gUniverse = new Object();
+var gSystemMap = null;
 
 var g3DScene = null;
 var gSelectedGalaxy = "";
@@ -55,7 +55,7 @@ function click_login() {
 
 }
 function click_download() {
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gUniverse));
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gSystemMap));
     var dlAnchorElem = document.getElementById('downloadAnchorElem');
     dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute("download", "scene.json");
@@ -65,7 +65,7 @@ function click_galaxy_callback() {
     console.log("click_galaxy_callback");
     var galaxyName = this.innerHTML;
     if (galaxyName == "Universe") {
-        var galaxyData = gUniverse[galaxyName];
+        var galaxyData = gSystemMap[galaxyName];
         gCamera.position.x = 0;//gScale*galaxyData[1];
         gCamera.position.y = 0;//gScale*galaxyData[2];
         gCamera.position.z = -1;//gScale*galaxyData[3]-3;
@@ -114,7 +114,7 @@ function GetNextSystem(data_i) {
     setTimeout(() => { sendCommand(url, "datasource=tranquility&language=en", ProcessSystem); }, 10);
 }
 
-function InitializeUniverse() {
+function LoadSystemsJSON() {
     //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
     loadExternalFile("systems.json", function (text) {
         try {
@@ -126,4 +126,112 @@ function InitializeUniverse() {
         }
     })
 
+}
+function AddSystemToSpace(space, system, systemType) {
+    if (space.bbox == undefined) {
+        space.bbox = new Object();
+        space.bbox.min = new Object();
+        space.bbox.min.x = 100000;
+        space.bbox.min.y = 100000;
+        space.bbox.min.z = 100000;
+        space.bbox.max = new Object();
+        space.bbox.max.x = -100000;
+        space.bbox.max.y = -100000;
+        space.bbox.max.z = -100000;
+    }
+    system.systemType = systemType;
+
+    space[system.name] = system;
+    space[system.name].position.x = space[system.name].position.x / metersPerAu;
+    space[system.name].position.y = space[system.name].position.y / metersPerAu;
+    space[system.name].position.z = space[system.name].position.z / metersPerAu;
+    if (system.position.x < space.bbox.min.x) {
+        space.bbox.min.x = system.position.x;
+    }
+    if (system.position.y < space.bbox.min.y) {
+        space.bbox.min.y = system.position.y;
+    }
+    if (system.position.z < space.bbox.min.z) {
+        space.bbox.min.z = system.position.z;
+    }
+    if (system.position.x > space.bbox.max.x) {
+        space.bbox.max.x = system.position.x;
+    }
+    if (system.position.y > space.bbox.max.y) {
+        space.bbox.max.y = system.position.y;
+    }
+    if (system.position.z > space.bbox.max.z) {
+        space.bbox.max.z = system.position.z;
+    }
+}
+function InitializeUniverse() {
+
+    gUniverse.NewEden = new Object();
+    gUniverse.NewEden.hisec = new Object();
+    gUniverse.NewEden.losec = new Object();
+    gUniverse.NewEden.nullsec = new Object();
+    gUniverse.WormholeSpace = new Object();
+    gUniverse.ShatteredWormholeSpace = new Object();
+    gUniverse.VSpace = new Object();
+    gUniverse.ADSpace = new Object();
+
+
+    for (const system_name in gSystemMap) {
+        var system = gSystemMap[system_name];
+
+        if (system.system_id < 31000000) {
+            if (system.security_status <= 0.0) {
+                systemType = "nullsec";
+            } else if (system.security_status < 0.5) {
+                systemType = "losec";
+            } else {
+                systemType = "hisec";
+            }
+            AddSystemToSpace(gUniverse.NewEden[systemType], system, systemType);
+        }
+        else if (system.system_id > 31000000 &&
+            system.system_id < 32000000) {
+            if (system_name[1] == '0') {
+                systemType = "ShatteredWormholeSpace"
+            } else {
+                systemType = "WormholeSpace";
+            }
+            AddSystemToSpace(gUniverse[systemType], system, systemType)
+        }
+        else if (system.system_id > 32000000 &&
+            system.system_id < 33000000) {
+            systemType = "ADSpace";
+            AddSystemToSpace(gUniverse[systemType], system, systemType)
+        }
+        else if (system.system_id > 34000000 &&
+            system.system_id < 35000000) {
+            systemType = "VSpace";
+            AddSystemToSpace(gUniverse[systemType], system, systemType)
+        }
+    }
+
+    gUniverse.NewEden.bbox = gUniverse.NewEden.nullsec.bbox;
+}
+
+function InitializeMenus() {
+
+    for (const system_name in gSystemMap) {
+        var system = gSystemMap[system_name];
+        var itemText = system.name
+            + " (" + system.position.x.toFixed(4)
+            + "," + system.position.y.toFixed(4)
+            + "," + system.position.z.toFixed(4)
+            + ")";
+        AddMenuItem(system.systemType, itemText);
+    }
+}
+
+function AddMenuItem(parentMenuID, itemText) {
+    var ul = document.getElementById(parentMenuID);
+    var li = document.createElement("li");
+    var textNode = document.createTextNode(itemText);
+    li.appendChild(textNode);
+    li.addEventListener("mouseover", hover_callback);
+    li.addEventListener("mousedown", click_callback);
+    ul.appendChild(li);
 }
