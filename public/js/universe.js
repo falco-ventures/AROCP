@@ -148,9 +148,7 @@ function click_space_callback() {
     var spaceName = this.innerHTML;
     console.log("click_space_callback " + spaceName);
 }
-
-function hover_callback() {
-    var systemName = this.innerHTML.split(' (')[0];
+function hover_system(systemName) {
     var systemData = gSystemMap[systemName];
     if (systemData != undefined) {
         var label = systemName;
@@ -176,7 +174,16 @@ function hover_callback() {
 
         gHoverPlane.material.opacityTexture = gHoverPlaneTexture;
         gHoverPlane.material.diffuseTexture = gHoverPlaneTexture;
+    } else {
+        if(gHoverPlane != undefined)
+            gHoverPlane.position.x = 100000;
+        if(gHoverSphere != undefined)
+            gHoverSphere.position.x = 100000;
     }
+}
+function hover_callback() {
+    var systemName = this.innerHTML.split(' (')[0];
+    hover_system(systemName)
 }
 function Get3DPositionFromSystem(system_data) {
     var space = gUniverse[system_data.systemType];
@@ -186,13 +193,8 @@ function Get3DPositionFromSystem(system_data) {
     offsetPosition.z = system_data.position.z - space.bbox.center.z + space.offset.z;
     return offsetPosition;
 }
-function click_system_callback() {
-    // console.log("click");
 
-    gSelectedSystem = "Jita";
-    //hover_callback();
-
-    var systemName = this.innerHTML.split(' (')[0];
+function select_system(systemName) {
     if (gSystemMap[systemName] != undefined) {
         var systemData = gSystemMap[systemName];
         if (systemData != undefined) {
@@ -208,12 +210,16 @@ function click_system_callback() {
 
             gCamera.position.x = gSelectionSphere.position.x;
             gCamera.position.y = gSelectionSphere.position.y;
-            gCamera.position.z = gSelectionSphere.position.z - 100;
+            gCamera.position.z = gSelectionSphere.position.z - 200;
 
             gCamera.setTarget(new BABYLON.Vector3(gSelectionSphere.position.x, gSelectionSphere.position.y, gSelectionSphere.position.z));
 
         }
     }
+}
+function click_system_callback() {
+    var systemName = this.innerHTML.split(' (')[0];
+    select_system(systemName);
 }
 function InitializeUniverse(systems_json) {
 

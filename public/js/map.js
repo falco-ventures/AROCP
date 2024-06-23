@@ -39,12 +39,12 @@ function create_selection_sphere(name) {
         gSelectionPlane.dispose();
     }
     var sphere = BABYLON.MeshBuilder.CreateSphere("SelectionSphere", { diameter: 0.5, segments: 32 }, sceneToRender);
-    var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 2, height: 1 }, Get3DScene());
+    var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 20, height: 10 }, Get3DScene());
     var planeMaterial = new BABYLON.StandardMaterial("SelectionMaterial", Get3DScene());
     var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("SelectionTexture", { width: 512, height: 256 }, Get3DScene());
     planeTexture.getContext();
     planeTexture.hasAlpha = true;
-    planeTexture.drawText(name, 0, 100, "bold 44px Arial", "white", "transparent", true, true);
+    planeTexture.drawText(name, 0, 200, "bold 44px Arial", "white", "transparent", true, true);
 
     planeMaterial.backFaceCulling = false;
     planeMaterial.disableLighting = true;
@@ -71,7 +71,7 @@ function create_hover_sphere(name) {
     sphere.material = sphereMaterial
 
 
-    var plane = BABYLON.MeshBuilder.CreatePlane("HoverPlane", { width: 2, height: 1 }, Get3DScene());
+    var plane = BABYLON.MeshBuilder.CreatePlane("HoverPlane", { width: 20, height: 10 }, Get3DScene());
     plane.isPickable = false;
     var planeMaterial = new BABYLON.StandardMaterial("HoverMaterial", Get3DScene());
     var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("HoverTexture", { width: 512, height: 256 }, Get3DScene());
@@ -175,9 +175,10 @@ var createScene = async function (systems_json) {
         await pcs.buildMeshAsync();
         pcs.mesh.material.sizeAttenuationPlugin.isEnabled = true;
     }
-    create_selection_sphere("Jita");
-    create_hover_sphere("Jita");
     
+    create_hover_sphere("Thera");
+    select_system("Thera")
+    hover_system("None");
     //Mouse
     scene.onPointerMove = function () {
         mousemovef();
