@@ -178,7 +178,7 @@ function hover_system(systemName) {
         }
 
         gHoverPlaneTexture.clear();
-        gHoverPlaneTexture.drawText(label, 0, 200, "bold 44px Arial", "white", "transparent", true, true);
+        gHoverPlaneTexture.drawText(label, 0, 256, "bold 44px Arial", "white", "transparent", true, true);
         gHoverSphere.position = p1;
 
         gHoverPlane.position.x = gHoverSphere.position.x;
