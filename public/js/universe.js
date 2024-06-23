@@ -1,5 +1,7 @@
 var gUniverse = new Object();
 var gSystemMap = new Object();
+var gConstellations = new Object();
+var gRegions = new Object();
 
 var g3DScene;
 var gSelectedGalaxy = "";
@@ -14,6 +16,8 @@ var metersPerAu = 9460000000000000;
 var gSystemList = new Array();
 var gUniverseScale = 1.0;
 var gCurrentSystemIO = 0;
+var gCurrentRegionIO = 0;
+var gCurrentConstellationIO = 0;
 
 var gSelectionName = "Jita";
 var gSelectedSystem = "Jita";
@@ -42,11 +46,11 @@ function click_login() {
     window.location = eveServer + "?" + scopes;
 
 }
-function click_download() {
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gSystemMap));
+function download_json(fileName, json) {
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
     var dlAnchorElem = document.getElementById('downloadAnchorElem');
     dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "g3DScene.json");
+    dlAnchorElem.setAttribute("download", fileName);
     dlAnchorElem.click();
 }
 
@@ -86,7 +90,60 @@ function GetNextSystem(data_i) {
     setTimeout(() => { sendCommand(url, "datasource=tranquility&language=en", ProcessSystem); }, 10);
 }
 
+function ProcessConstellation(cData_i) {
+    var constellationData = JSON.parse(cData_i.responseText);
+    if (constellationData != null) {
+        gConstellations[constellationData.constellation_id] = constellationData;
+        var constellationIDs = Object.keys(gConstellations);
+        if (gCurrentConstellationIO < constellationIDs.length) {
+            GetNextConstellation();
+        } else {
+            download_json("constellations.json", gConstellations);
+        }
+
+    }
+
+}
+function GetNextConstellation(data_i) {
+    var constellationIDs = Object.keys(gConstellations);
+
+    if (constellationIDs == undefined || constellationIDs.length == 0) {
+        var data = JSON.parse(data_i.responseText);
+        for (var i = 0; i < data.length; i++) {
+            gConstellations[String(data[i])] = new Object();
+            gConstellations[String(data[i])].constellation_id = String(data[i]);
+        }
+    }
+    constellationIDs = Object.keys(gConstellations);
+    var url = "https://esi.evetech.net/latest/universe/constellations/" + gConstellations[constellationIDs[gCurrentConstellationIO]].constellation_id + "/";
+    if (gCurrentConstellationIO % 10 == 0) {
+        console.log("Getting " + gCurrentConstellationIO + " of " + constellationIDs.length );
+    }
+    gCurrentConstellationIO++;
+    setTimeout(() => { sendCommand(url, "datasource=tranquility&language=en", ProcessConstellation); }, 10);
+}
 function LoadSystemsJSON() {
+    //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
+    loadExternalFile("constellations.json", function (text) {
+        try {
+            gConstellations = JSON.parse(text);
+        } catch {
+            gConstellations = new Object();
+            //https://esi.evetech.net/latest/universe/systems/?datasource=tranquility
+            sendCommand("https://esi.evetech.net/latest/universe/constellations/", "datasource=tranquility", GetNextConstellation);
+        }
+    })
+    // //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
+    // loadExternalFile("regions.json", function (text) {
+    //     try {
+    //         gSystems = JSON.parse(text);
+    //         startApplication(gSystems);
+    //     } catch {
+    //         //https://esi.evetech.net/latest/universe/systems/?datasource=tranquility
+    //         sendCommand("https://esi.evetech.net/latest/universe/regions/", "datasource=tranquility", GetNextRegion);
+    //     }
+    // })
+
     //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
     loadExternalFile("systems.json", function (text) {
         try {
