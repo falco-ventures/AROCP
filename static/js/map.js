@@ -126,73 +126,62 @@ BABYLON.AbstractMesh.prototype.addPickingBox = function () {
     return _this;
 };
 var createScene = async function (systems_json) {
-    // if(gInitialized == false) {
-    //     gInitialized = true;
-    //     return;
-    // }
-
     if (sceneToRender != null)
         return null;
-    var scene = new BABYLON.Scene(engine);
-    var black = [0, 0, 0];
-    scene.clearColor = new BABYLON.Color4(128, 128, 128, 0);
-    // scene.clearColor = [128,128,128];
 
-    // Create camera and light
-    // var light = new BABYLON.PointLight("Point", new BABYLON.Vector3(0, 0, 0), scene);
+    var scene = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color4(0,0,0,1);
+
+    //Main camera
     var camera = new BABYLON.ArcRotateCamera("Camera",
-        0, 0, 150,
+        0, 0, 350,
         new BABYLON.Vector3(0, 0, 0),
         scene);
     camera.wheelPrecision = 1;
     camera.attachControl(canvas, true);
 
     camera.minZ = 0.001;
-    camera.maxZ = 1000;
+    camera.maxZ = 10000;
+    scene.activeCameras.push(camera);
     gCamera = camera;
 
-    gNavigatorCamera = new BABYLON.ArcRotateCamera("Camera",
-        0, 0, 150,
+    //Nav Window camera
+    gNavigatorCamera = new BABYLON.ArcRotateCamera("Nav Camera",
+        0, 0, 350,
         new BABYLON.Vector3(0, 0, 0),
         scene);
-
     gNavigatorCamera.minZ = 0.001;
-    gNavigatorCamera.maxZ = 1000;
+    gNavigatorCamera.maxZ = 10000;
     gNavigatorCamera.viewport = new BABYLON.Viewport(0, 0.8, 0.2, 0.2);
-    scene.activeCameras.push(camera);
     scene.activeCameras.push(gNavigatorCamera);
 
-
-
-    scene.onPointerMove = function () {
-        mousemovef();
-    };
-
+    //Register size attenuator
     BABYLON.RegisterMaterialPlugin("SizeAttenuation", (material) => {
         material.sizeAttenuationPlugin = new SizeAttenuationMaterialPlugin(material);
         return material.colorify;
     });
 
-    create_selection_sphere("Jita");
-    create_hover_sphere("Jita");
-    
-
+    //Add the points
     for (const space_name in gUniverse) {
         pcs = gUniverse[space_name].pcs;
 
         var keys = Object.keys(gUniverse[space_name].systems);
         pcs.addPoints(keys.length, (particle, i) => {
             var system = keys[i];
-            var position = gUniverse[space_name].systems[system].position;
-            particle.position.x = position.x;
-            particle.position.y = position.y;
-            particle.position.z = position.z;
+            
+            particle.position = Get3DPositionFromSystem(gUniverse[space_name].systems[system])
             particle.color = gUniverse[space_name].systems[system].color;
         });
         await pcs.buildMeshAsync();
         pcs.mesh.material.sizeAttenuationPlugin.isEnabled = true;
     }
+    create_selection_sphere("Jita");
+    create_hover_sphere("Jita");
     
+    //Mouse
+    scene.onPointerMove = function () {
+        mousemovef();
+    };
     scene.onPointerObservable.add((pointerInfo) => {
         switch (pointerInfo.type) {
             case BABYLON.PointerEventTypes.POINTERDOWN:

@@ -155,20 +155,20 @@ function hover_callback() {
     if (systemData != undefined) {
         var label = systemName;
         var selectedSystemData = gSystemMap[gSelectedSystem];
+        var p1 = Get3DPositionFromSystem(systemData);
         // gUniverseScale = gJitaCenter[0] / (gSystemMap["Jita"].position.x);
         if (selectedSystemData != undefined) {
-            var dx = (systemData.position.x - selectedSystemData.position.x);
-            var dy = (systemData.position.y - selectedSystemData.position.y);
-            var dz = (systemData.position.z - selectedSystemData.position.z);
+            var p2 = Get3DPositionFromSystem(selectedSystemData);
+            var dx = (p1.x - p2.x);
+            var dy = (p1.y - p2.y);
+            var dz = (p1.z - p2.z);
             var distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
             label = systemName + " " + distance + " from " + selectedSystemData.name;
         }
 
         gHoverPlaneTexture.clear();
         gHoverPlaneTexture.drawText(label, 0, 54, "bold 44px Arial", "white", "transparent", true, true);
-        gHoverSphere.position.x = systemData.position.x;
-        gHoverSphere.position.y = systemData.position.y;
-        gHoverSphere.position.z = systemData.position.z;
+        gHoverSphere.position = p1;
 
         gHoverPlane.position.x = gHoverSphere.position.x;
         gHoverPlane.position.y = gHoverSphere.position.y+1;
@@ -178,7 +178,14 @@ function hover_callback() {
         gHoverPlane.material.diffuseTexture = gHoverPlaneTexture;
     }
 }
-
+function Get3DPositionFromSystem(system_data) {
+    var space = gUniverse[system_data.systemType];
+    var offsetPosition = system_data.position;
+    offsetPosition.x -= space.bbox.center.x;
+    offsetPosition.y -= space.bbox.center.y;
+    offsetPosition.z -= space.bbox.center.z;
+    return system_data.position;
+}
 function click_system_callback() {
     // console.log("click");
 
@@ -193,9 +200,7 @@ function click_system_callback() {
 
             create_selection_sphere(systemName);
 
-            gSelectionSphere.position.x = systemData.position.x;
-            gSelectionSphere.position.y = systemData.position.y;
-            gSelectionSphere.position.z = systemData.position.z;
+            gSelectionSphere.position = Get3DPositionFromSystem(gSystemMap[systemName]);
 
             gSelectionPlane.position.x = gSelectionSphere.position.x;
             gSelectionPlane.position.y = gSelectionSphere.position.y+1;
@@ -284,7 +289,7 @@ function InitializeUniverse(systems_json) {
             color = blue;
         }
         systems_json[system].color = new BABYLON.Color3(color[0], color[1], color[2]);
-
+        
         //Add to system map
         gSystemMap[systemName] = systems_json[system];
     }
@@ -365,6 +370,13 @@ function InitializeUniverse(systems_json) {
     }
 
     // gUniverse.NewEden.bbox = gUniverse.NewEden.nullsec.bbox;
+
+    for (const space_name in gUniverse) {
+        gUniverse[space_name].bbox.center = new Object();
+        gUniverse[space_name].bbox.center.x = (gUniverse[space_name].bbox.min.x + gUniverse[space_name].bbox.max.x)/2;
+        gUniverse[space_name].bbox.center.y = (gUniverse[space_name].bbox.min.y + gUniverse[space_name].bbox.max.y)/2;
+        gUniverse[space_name].bbox.center.z = (gUniverse[space_name].bbox.min.z + gUniverse[space_name].bbox.max.z)/2;
+    }
 }
 
 function InitializeMenus() {
