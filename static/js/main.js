@@ -144,6 +144,7 @@ function authorization_callback(data, callback_data) {
 
     }
 }
+
 function authorize_character_code(code) {
     //See: https://developers.eveonline.com/blog/article/sso-to-authenticated-calls
     //And: https://developers.eveonline.com/applications/details/84209#app-section-details
