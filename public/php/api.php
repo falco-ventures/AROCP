@@ -39,10 +39,8 @@ function CurlSendPostRequest($url,$request)
         return $data;
     }
 
-    function CurlSendGetRequest($url,$headers)
+    function CurlSendGetRequest($url,$token)
     {
-        $authentication = base64_encode("5fe7b21736e748c6a78d9e4f98ff536e:5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU");
-
         $ch = curl_init($url);
         $options = array(
                 CURLOPT_RETURNTRANSFER => true,         // return web page
@@ -57,7 +55,7 @@ function CurlSendPostRequest($url,$request)
                 CURLOPT_SSL_VERIFYPEER => false,        //
                 CURLOPT_VERBOSE        => 1,
                 CURLOPT_HTTPHEADER     => array(
-                    "Authorization: Bearer $authentication",
+                    "Authorization: Bearer $token",
                     "Content-Type: application/json"
                 )
 
