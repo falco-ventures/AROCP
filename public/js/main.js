@@ -1,17 +1,5 @@
 console.log("AeroCorp Eve API Loaded!");
 
-//localhost
-var auth = "ZGI4ZTMzOTg5N2JiNDE3Zjk3MWZmMDdlZjYxN2U5Njc6TXNMZWxlZTFMcmo5eG5zYXhHdFozMW5ITHVyRG9VT1J2NjZkeU1hdA==";
-
-// var auth = btoa("db8e339897bb417f971ff07ef617e967:MsLelee1Lrj9xnsaxGtZ31nHLurDoUORv66dyMat");
-// console.log(auth);
-if(window.location.origin.includes("github.io")) {
-    //web site
-    // var auth = btoa("5fe7b21736e748c6a78d9e4f98ff536e:5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU");
-    // console.log(auth);
-    auth = "NWZlN2IyMTczNmU3NDhjNmE3OGQ5ZTRmOThmZjUzNmU6NWUwdEVmbjF0TndGUHZFejRFRWNYY0pJcFNuZ2RHUUJjM2NiZE9nVQ=="
-}
-
 var gCharacterCodes = new Array();
 
 function setCookie(cname, cvalue, exdays) {
@@ -67,7 +55,7 @@ function parse_my_url() {
     }
 }
 
-function sendCommand(commandName, paramString , callback, command_type, headers, body, callback_data) {
+function sendCommand(commandName, paramString, callback, command_type, headers, body, callback_data) {
     if (command_type == undefined)
         command_type = "GET"
     function reqListener() {
@@ -89,10 +77,10 @@ function sendCommand(commandName, paramString , callback, command_type, headers,
     if (headers != undefined) {
         for (let header in headers) {
             // console.log(`key: ${header} : value: ${headers[header]}`)
-            req.setRequestHeader(String(header),String(headers[header]));
+            req.setRequestHeader(String(header), String(headers[header]));
         }
     }
-    req.setRequestHeader('Access-Control-Allow-Origin',window.location.origin);
+    req.setRequestHeader('Access-Control-Allow-Origin', window.location.origin);
 
     if (body != undefined && body != null) {
         //Send the proper header information along with the request
@@ -100,14 +88,14 @@ function sendCommand(commandName, paramString , callback, command_type, headers,
 
         // console.log(JSON.stringify(body))
         req.send(JSON.stringify(body));
-    }else
+    } else
         req.send();
 }
 
 function verification_callback(data, loginCredentials) {
-    if(data != undefined) {
+    if (data != undefined) {
         console.log("Requested " + loginCredentials.access_token + " and got " + data.responseText);
-        
+
         // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
         /*
         {"CharacterID":95465499,"CharacterName":"CCP Bartender","ExpiresOn":"2017-07-05T14:34:16.5857101","Scopes":"esi-characters.read_standings.v1","TokenType":"Character","CharacterOwnerHash":"lots_of_letters_and_numbers","IntellectualProperty":"EVE"}
@@ -116,7 +104,7 @@ function verification_callback(data, loginCredentials) {
         try {
             var characterInfo = JSON.parse(data.responseText);
             alert("Welcome " + characterInfo.CharacterName + " ID: " + characterInfo.CharacterID)
-        } catch(e){
+        } catch (e) {
 
         }
 
@@ -124,11 +112,11 @@ function verification_callback(data, loginCredentials) {
 }
 
 function authorization_callback(data, callback_data) {
-    if(data != undefined) {
+    if (data != undefined) {
         console.log("Requested " + callback_data.code + " and got " + data.responseText);
-        
+
         // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
-        try { 
+        try {
             var loginCredentials = JSON.parse(data.responseText);
             var base = "https://esi.evetech.net/verify/";
             var paramString = "";
@@ -137,48 +125,58 @@ function authorization_callback(data, callback_data) {
             headers["Content-Type"] = "application/json";
             headers["Authorization"] = "Bearer " + loginCredentials.access_token;
             loginCredentials.code = callback_data;
-            sendCommand(base, paramString,verification_callback, command_type, headers, null, loginCredentials);
-        } catch(e){
+            sendCommand(base, paramString, verification_callback, command_type, headers, null, loginCredentials);
+        } catch (e) {
 
         }
 
     }
 }
 
-function authorize_character_code(code) {
+function authorize_character_code_local(code) {
     //See: https://developers.eveonline.com/blog/article/sso-to-authenticated-calls
     //And: https://developers.eveonline.com/applications/details/84209#app-section-details
     // console.log("Requesting character data for: " + code)
     // curl -XPOST -H "Content-Type:application/json" -H "Authorization:Basic Y2xpZW50X2lkOmNsaWVudHNlY3JldDE=" -d '{"grant_type":"authorization_code", "code":"ckEZIa6JUOdoN6ijmqBI...qgpU-SmPsZ0"}' https://login.eveonline.com/oauth/token
+    var auth = "ZGI4ZTMzOTg5N2JiNDE3Zjk3MWZmMDdlZjYxN2U5Njc6TXNMZWxlZTFMcmo5eG5zYXhHdFozMW5ITHVyRG9VT1J2NjZkeU1hdA==";
 
-    var base = "https://instacardapp.com/AROCP/public/php/api.php";////https://login.eveonline.com/oauth/token";
+    // var auth = btoa("db8e339897bb417f971ff07ef617e967:MsLelee1Lrj9xnsaxGtZ31nHLurDoUORv66dyMat");
+    // console.log(auth);
+    var auth = "ZGI4ZTMzOTg5N2JiNDE3Zjk3MWZmMDdlZjYxN2U5Njc6TXNMZWxlZTFMcmo5eG5zYXhHdFozMW5ITHVyRG9VT1J2NjZkeU1hdA==";
+    var base = "https://login.eveonline.com/oauth/token";
+    var paramString = "";
+    var command_type = "POST";
+    var headers = {};
+
+    headers["Content-Type"] = "application/json";
+    headers["Authorization"] = "Basic " + auth;
+
+
+    var bodyObject = {};
+    bodyObject["grant_type"] = "authorization_code";
+    bodyObject["code"] = code;
+    var callback_data = code;
+
+    sendCommand(base, paramString, authorization_callback, command_type, headers, bodyObject, callback_data);
+}
+
+function authorize_character_code(code) {
+    var base = "https://instacardapp.com/AROCP/public/php/api.php";
     var paramString = "code=" + code;
     var command_type = "GET";
     var headers = {};
     headers["Content-Type"] = "application/json";
-
-    // headers["Content-Length"] = "Basic " + auth;
-
-    
-    // var bodyObject = {};
-    // bodyObject["grant_type"] = "authorization_code";
-    // bodyObject["code"] = code;
     var callback_data = code;
-/*
-TODO:
-Note that access tokens are only valid for 20 minutes, after which you can re-run this step with the same headers and the following body to use the refresh token to get another access token at any time:
-
-    {
-      "grant_type":"refresh_token",
-      "refresh_token":"{the refresh token}"
-    }
-    */
-    sendCommand(base, paramString,authorization_callback, command_type, headers, null, callback_data);
-    
+    sendCommand(base, paramString, authorization_callback, command_type, headers, null, callback_data);
 }
+
 function download_character_info() {
     for (i in gCharacterCodes) {
-        authorize_character_code(gCharacterCodes[i]);
+        if (window.location.href.includes("localhost"))
+            authorize_character_code_local(gCharacterCodes[i]);
+        else
+
+            authorize_character_code(gCharacterCodes[i]);
     }
 }
 

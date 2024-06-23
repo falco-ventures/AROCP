@@ -1,4 +1,5 @@
 <?php
+
 /*
 Eve Online character login
 */
