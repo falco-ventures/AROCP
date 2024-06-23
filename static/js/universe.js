@@ -33,19 +33,7 @@ gUniverseMax.z = 0;
 var gJitaCenter = [-1.29064861735e+17, 6.075530691e+16, - 1.1746922706e+17];
 
 var gInitialized = false;
-/*
-list clicking
-*/
-for (i = 0; i < toggler.length; i++) {
-    toggler[i].addEventListener("click", click_galaxy_callback);
-    toggler[i].addEventListener("click", function () {
-        this.parentElement.querySelector(".nested").classList.toggle("active");
-        this.classList.toggle("check-box");
 
-
-
-    });
-}
 
 
 function click_login() {
@@ -61,22 +49,6 @@ function click_download() {
     dlAnchorElem.setAttribute("download", "scene.json");
     dlAnchorElem.click();
 }
-function click_galaxy_callback() {
-    console.log("click_galaxy_callback");
-    var galaxyName = this.innerHTML;
-    if (galaxyName == "Universe") {
-        var galaxyData = gSystemMap[galaxyName];
-        gCamera.position.x = 0;//gScale*galaxyData[1];
-        gCamera.position.y = 0;//gScale*galaxyData[2];
-        gCamera.position.z = -1;//gScale*galaxyData[3]-3;
-
-
-        gCamera.setTarget(new BABYLON.Vector3(0, 0, 0));//gScale*galaxyData[1],gScale*galaxyData[2],gScale*galaxyData[3]));
-
-
-    }
-}
-
 
 
 function ProcessSystem(systemData_i) {
@@ -142,9 +114,10 @@ function AddSystemToSpace(space, system, systemType) {
     system.systemType = systemType;
 
     space[system.name] = system;
-    space[system.name].position.x = space[system.name].position.x ;
-    space[system.name].position.y = space[system.name].position.y ;
-    space[system.name].position.z = space[system.name].position.z ;
+    // space[system.name].position.x = space[system.name].position.x / metersPerAu ;
+    // space[system.name].position.y = space[system.name].position.y / metersPerAu ;
+    // space[system.name].position.z = space[system.name].position.z / metersPerAu ;
+
     if (space[system.name].position.x < space.bbox.min.x) {
         space.bbox.min.x = space[system.name].position.x;
     }
@@ -162,6 +135,79 @@ function AddSystemToSpace(space, system, systemType) {
     }
     if (space[system.name].position.z > space.bbox.max.z) {
         space.bbox.max.z = space[system.name].position.z;
+    }
+}
+
+/*
+
+Menus
+
+*/
+
+function click_space_callback() {
+    var spaceName = this.innerHTML;
+    console.log("click_space_callback " + spaceName);
+}
+
+function hover_callback() {
+    var systemName = this.innerHTML.split(' (')[0];
+    var systemData = gSystemMap[systemName];
+    if (systemData != undefined) {
+        var label = systemName;
+        var selectedSystemData = gSystemMap[gSelectedSystem];
+        // gUniverseScale = gJitaCenter[0] / (gSystemMap["Jita"].position.x);
+        if (selectedSystemData != undefined) {
+            var dx = (systemData.position.x - selectedSystemData.position.x);
+            var dy = (systemData.position.y - selectedSystemData.position.y);
+            var dz = (systemData.position.z - selectedSystemData.position.z);
+            var distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            label = systemName + " " + distance + " from " + selectedSystemData.name;
+        }
+
+        gHoverPlaneTexture.clear();
+        gHoverPlaneTexture.drawText(label, 0, 54, "bold 44px Arial", "white", "transparent", true, true);
+        gHoverSphere.position.x = systemData.position.x;
+        gHoverSphere.position.y = systemData.position.y;
+        gHoverSphere.position.z = systemData.position.z;
+
+        gHoverPlane.position.x = gHoverSphere.position.x;
+        gHoverPlane.position.y = gHoverSphere.position.y+1;
+        gHoverPlane.position.z = gHoverSphere.position.z;
+
+        gHoverPlane.material.opacityTexture = gHoverPlaneTexture;
+        gHoverPlane.material.diffuseTexture = gHoverPlaneTexture;
+    }
+}
+
+function click_system_callback() {
+    // console.log("click");
+
+    gSelectedSystem = "";
+    //hover_callback();
+
+    var systemName = this.innerHTML.split(' (')[0];
+    if (gSystemMap[systemName] != undefined) {
+        var systemData = gSystemMap[systemName];
+        if (systemData != undefined) {
+            gSelectedSystem = systemName;
+
+            create_selection_sphere(systemName);
+
+            gSelectionSphere.position.x = systemData.position.x;
+            gSelectionSphere.position.y = systemData.position.y;
+            gSelectionSphere.position.z = systemData.position.z;
+
+            gSelectionPlane.position.x = gSelectionSphere.position.x;
+            gSelectionPlane.position.y = gSelectionSphere.position.y+1;
+            gSelectionPlane.position.z = gSelectionSphere.position.z;
+
+            gCamera.position.x = gSelectionSphere.position.x;
+            gCamera.position.y = gSelectionSphere.position.y;
+            gCamera.position.z = gSelectionSphere.position.z - 100;
+
+            gCamera.setTarget(new BABYLON.Vector3(gSelectionSphere.position.x, gSelectionSphere.position.y, gSelectionSphere.position.z));
+
+        }
     }
 }
 function InitializeUniverse() {
@@ -196,9 +242,9 @@ function InitializeUniverse() {
         }
         else if (system.system_id > 31000000 &&
             system.system_id < 32000000) {
-                if (system.system_id <= 31000006) {
-                    systemType = "ShatteredWormholeSpace"
-                } else if (system_name[1] == '0') {
+            if (system.system_id <= 31000006) {
+                systemType = "ShatteredWormholeSpace"
+            } else if (system_name[1] == '0') {
                 systemType = "ShatteredWormholeSpace"
             } else {
                 systemType = "WormholeSpace";
@@ -225,28 +271,42 @@ function InitializeMenus() {
     for (const system_name in gSystemMap) {
         var system = gSystemMap[system_name];
         var itemText = system.name
-            + " (" + (system.position.x/metersPerAu).toFixed(2)
-            + "," + (system.position.y/metersPerAu).toFixed(2)
-            + "," +(system.position.z/metersPerAu).toFixed(2)
+            + " (" + (system.position.x).toFixed(2)
+            + "," + (system.position.y).toFixed(2)
+            + "," + (system.position.z).toFixed(2)
             + ")";
         AddMenuItem(system.systemType, itemText);
     }
 
     for (const space_name in gUniverse) {
-        var menuItem = document.getElementById(space_name+"UL");
+        var menuItem = document.getElementById(space_name + "UL");
 
 
         var itemText = gUniverse[space_name].name
-            + " (" + (gUniverse[space_name].bbox.min.x/metersPerAu).toFixed(2)
-            + "," + (gUniverse[space_name].bbox.min.y/metersPerAu).toFixed(2)
-            + "," + (gUniverse[space_name].bbox.min.z/metersPerAu).toFixed(2)
+            + " (" + (gUniverse[space_name].bbox.min.x).toFixed(2)
+            + "," + (gUniverse[space_name].bbox.min.y).toFixed(2)
+            + "," + (gUniverse[space_name].bbox.min.z).toFixed(2)
             + ") - "
-            + " (" + (gUniverse[space_name].bbox.max.x/metersPerAu).toFixed(2)
-            + "," + (gUniverse[space_name].bbox.max.y/metersPerAu).toFixed(2)
-            + "," + (gUniverse[space_name].bbox.max.z/metersPerAu).toFixed(2)
+            + " (" + (gUniverse[space_name].bbox.max.x).toFixed(2)
+            + "," + (gUniverse[space_name].bbox.max.y).toFixed(2)
+            + "," + (gUniverse[space_name].bbox.max.z).toFixed(2)
             + ")";
 
         menuItem.innerHTML = itemText;
+    }
+
+    /*
+    list clicking
+    */
+    for (i = 0; i < toggler.length; i++) {
+        toggler[i].addEventListener("click", click_space_callback);
+        toggler[i].addEventListener("click", function () {
+            this.parentElement.querySelector(".nested").classList.toggle("active");
+            this.classList.toggle("check-box");
+
+
+
+        });
     }
 
 }
@@ -257,6 +317,6 @@ function AddMenuItem(parentMenuID, itemText) {
     var textNode = document.createTextNode(itemText);
     li.appendChild(textNode);
     li.addEventListener("mouseover", hover_callback);
-    li.addEventListener("mousedown", click_callback);
+    li.addEventListener("mousedown", click_system_callback);
     ul.appendChild(li);
 }

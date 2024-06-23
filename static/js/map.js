@@ -37,8 +37,8 @@ function create_selection_sphere(name) {
         gSelectionSphere.dispose();
         gSelectionPlane.dispose();
     }
-    var sphere = BABYLON.MeshBuilder.CreateSphere("SelectionSphere", { diameter: 0.0001, segments: 32 }, g3DScene);
-    var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 0.0020, height: 0.003 }, g3DScene);
+    var sphere = BABYLON.MeshBuilder.CreateSphere("SelectionSphere", { diameter: 0.5, segments: 32 }, g3DScene);
+    var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 2, height: 1 }, g3DScene);
     var planeMaterial = new BABYLON.StandardMaterial("SelectionMaterial", g3DScene);
     var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("SelectionTexture", { width: 512, height: 256 }, g3DScene);
     planeTexture.getContext();
@@ -63,14 +63,14 @@ function create_selection_sphere(name) {
 }
 
 function create_hover_sphere(name) {
-    var sphere = BABYLON.MeshBuilder.CreateSphere("HoverSphere", { diameter: 0.0001, segments: 32 }, g3DScene);
+    var sphere = BABYLON.MeshBuilder.CreateSphere("HoverSphere", { diameter: 0.5, segments: 32 }, g3DScene);
     sphere.isPickable = false;
     var sphereMaterial = new BABYLON.StandardMaterial("SphereMaterial", g3DScene);
     sphereMaterial.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
     sphere.material = sphereMaterial
 
 
-    var plane = BABYLON.MeshBuilder.CreatePlane("HoverPlane", { width: 0.005, height: 0.0025 }, g3DScene);
+    var plane = BABYLON.MeshBuilder.CreatePlane("HoverPlane", { width: 2, height: 1 }, g3DScene);
     plane.isPickable = false;
     var planeMaterial = new BABYLON.StandardMaterial("HoverMaterial", g3DScene);
     var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("HoverTexture", { width: 512, height: 256 }, g3DScene);
@@ -96,59 +96,7 @@ function create_hover_sphere(name) {
     gHoverPlaneTexture = planeTexture;
 }
 
-function hover_callback() {
-    var galaxyName = this.innerHTML.split(' (')[0];
-    var galaxyData = gSystemMap[galaxyName];
-    var label = galaxyName;
-    var selectedGalaxyData = gSystemMap[gSelectedGalaxy];
-    // gUniverseScale = gJitaCenter[0] / (gSystemMap["Jita"].position.x);
-    if (galaxyData != undefined && selectedGalaxyData != undefined) {
-        var dx = (galaxyData.position.x - selectedGalaxyData.position.x);
-        var dy = (galaxyData.position.y - selectedGalaxyData.position.y);
-        var dz = (galaxyData.position.z - selectedGalaxyData.position.z);
-        var distance = Math.sqrt(dx * dx + dy * dy + dz * dz) / metersPerAu;
-        label = galaxyName + " " + distance + " from " + selectedGalaxyData.name;
-    }
-    gHoverPlaneTexture.clear();
-    gHoverPlaneTexture.drawText(label, 0, 54, "bold 44px Arial", "white", "transparent", true, true);
-    gHoverSphere.position.x = gScale * galaxyData.position.x / gUniverseScale;
-    gHoverSphere.position.y = gScale * galaxyData.position.y / gUniverseScale;
-    gHoverSphere.position.z = gScale * galaxyData.position.z / gUniverseScale;
 
-    gHoverPlane.position.x = gHoverSphere.position.x;
-    gHoverPlane.position.y = gHoverSphere.position.y;
-    gHoverPlane.position.z = gHoverSphere.position.z;
-
-    gHoverPlane.material.opacityTexture = gHoverPlaneTexture
-    gHoverPlane.material.diffuseTexture = gHoverPlaneTexture
-}
-
-function click_callback() {
-    // console.log("click");
-
-    gSelectedGalaxy = "";
-    //hover_callback();
-
-    var galaxyName = this.innerHTML.split(' (')[0];
-    var galaxyData = gSystemMap[galaxyName];
-    gSelectedGalaxy = galaxyName;
-
-    create_selection_sphere(galaxyName);
-
-    gSelectionSphere.position.x = gScale * galaxyData.position.x / gUniverseScale;
-    gSelectionSphere.position.y = gScale * galaxyData.position.y / gUniverseScale;
-    gSelectionSphere.position.z = gScale * galaxyData.position.z / gUniverseScale;
-
-    gSelectionPlane.position.x = gSelectionSphere.position.x;
-    gSelectionPlane.position.y = gSelectionSphere.position.y;
-    gSelectionPlane.position.z = gSelectionSphere.position.z;
-
-    gCamera.position.x = gSelectionSphere.position.x;
-    gCamera.position.y = gSelectionSphere.position.y;
-    gCamera.position.z = gSelectionSphere.position.z - 0.01;
-
-    gCamera.setTarget(new BABYLON.Vector3(gSelectionSphere.position.x, gSelectionSphere.position.y, gSelectionSphere.position.z));
-}
 var pcs;
 function vecToLocal(vector, mesh) {
     var m = mesh.getWorldMatrix();
@@ -205,17 +153,23 @@ var createScene = async function (universe) {
 
     // Create camera and light
     // var light = new BABYLON.PointLight("Point", new BABYLON.Vector3(0, 0, 0), scene);
-    var camera = new BABYLON.ArcRotateCamera("Camera", 0.07, 0.07, 1, new BABYLON.Vector3(0, 0, 0), scene);
-    camera.wheelPrecision = 100;
+    var camera = new BABYLON.ArcRotateCamera("Camera",
+        0, 0, 150,
+        new BABYLON.Vector3(0, 0, 0),
+        scene);
+    camera.wheelPrecision = 1;
     camera.attachControl(canvas, true);
 
-    camera.minZ = 0.0001;
-    camera.maxZ = 100;
+    camera.minZ = 0.001;
+    camera.maxZ = 1000;
     gCamera = camera;
 
-    gNavigatorCamera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1.5, new BABYLON.Vector3(0, 0, 0), scene);
+    gNavigatorCamera = new BABYLON.ArcRotateCamera("Camera",
+        0, 0, 150,
+        new BABYLON.Vector3(0, 0, 0),
+        scene);
 
-    gNavigatorCamera.minZ = 0.0001;
+    gNavigatorCamera.minZ = 0.001;
     gNavigatorCamera.maxZ = 1000;
     gNavigatorCamera.viewport = new BABYLON.Viewport(0, 0.8, 0.2, 0.2);
     scene.activeCameras.push(camera);
@@ -274,17 +228,20 @@ var createScene = async function (universe) {
     create_selection_sphere("Jita");
     create_hover_sphere("Jita");
     for (var i = 0; i < keys.length; ++i) {
-        // for (var galaxy in universe) {
-        var galaxy = keys[i];
-        var galaxyName = universe[galaxy].name;
-        // if(galaxyName == undefined || !galaxyName.includes("NGC"))
+        // for (var system in universe) {
+        var system = keys[i];
+        var systemName = universe[system].name;
+        // if(systemName == undefined || !systemName.includes("NGC"))
         //      continue;
 
-        gSystemMap[galaxyName] = universe[galaxy];
-        let x = gScale * universe[galaxy].position.x;
-        let y = gScale * universe[galaxy].position.y;
-        let z = gScale * universe[galaxy].position.z;
-        let security = universe[galaxy].security_status;
+        universe[system].position.x = universe[system].position.x / metersPerAu;
+        universe[system].position.y = universe[system].position.y / metersPerAu;
+        universe[system].position.z = universe[system].position.z / metersPerAu;
+        gSystemMap[systemName] = universe[system];
+        let x = gScale * universe[system].position.x;
+        let y = gScale * universe[system].position.y;
+        let z = gScale * universe[system].position.z;
+        let security = universe[system].security_status;
         let magnitude = 500;
         var purple = [1, 0, 1];
         var blue = [0, 0, 1];
@@ -329,7 +286,7 @@ var createScene = async function (universe) {
         }
         var systemType = "unknown";
 
-        if (universe[galaxy].system_id < 31000000) {
+        if (universe[system].system_id < 31000000) {
 
             if (security <= 0.0) {
                 systemType = "nullsec";
@@ -339,20 +296,20 @@ var createScene = async function (universe) {
                 systemType = "hisec";
             }
         }
-        else if (universe[galaxy].system_id > 31000000 &&
-            universe[galaxy].system_id < 32000000) {
-            if (galaxyName[1] == '0') {
+        else if (universe[system].system_id > 31000000 &&
+            universe[system].system_id < 32000000) {
+            if (systemName[1] == '0') {
                 systemType = "shatteredwormhole"
             } else {
                 systemType = "wormhole";
             }
         }
-        else if (universe[galaxy].system_id > 32000000 &&
-            universe[galaxy].system_id < 33000000) {
+        else if (universe[system].system_id > 32000000 &&
+            universe[system].system_id < 33000000) {
             systemType = "adspace";
         }
-        else if (universe[galaxy].system_id > 34000000 &&
-            universe[galaxy].system_id < 35000000) {
+        else if (universe[system].system_id > 34000000 &&
+            universe[system].system_id < 35000000) {
             systemType = "vspace";
         }
 
@@ -382,11 +339,11 @@ var createScene = async function (universe) {
             band = 7;
         }
         if (octant) {
-            bands[band][octant - 1] = universe[galaxy];
+            bands[band][octant - 1] = universe[system];
         }
 
-        
-        // if (universe[galaxyName].system_id < 31000000) {
+
+        // if (universe[systemName].system_id < 31000000) {
         positions.push(new BABYLON.Vector3(x, y, z));
         sizes.push(new BABYLON.Vector3(magnitude, magnitude, magnitude));
 
@@ -434,9 +391,9 @@ var createScene = async function (universe) {
 
     if (showPoints) {
         pcs.addPoints(positions.length, (particle, i) => {
-            particle.position.x = positions[i].x / gUniverseScale;
-            particle.position.y = positions[i].y / gUniverseScale;
-            particle.position.z = positions[i].z / gUniverseScale;
+            particle.position.x = positions[i].x ;
+            particle.position.y = positions[i].y ;
+            particle.position.z = positions[i].z ;
             particle.color = colors[i];
             particle.scale = sizes[i];
         });
@@ -590,8 +547,8 @@ function startApplication(data) {
                 return createDefaultEngine();
             }
         }
-        
-        engine= await asyncEngineCreation();
+
+        engine = await asyncEngineCreation();
         if (!engine) throw 'engine should not be null.';
         scene = createScene(data);
         InitializeUniverse();
