@@ -145,35 +145,40 @@ function AddSystemToSpace(space, system, systemType) {
     space[system.name].position.x = space[system.name].position.x / metersPerAu;
     space[system.name].position.y = space[system.name].position.y / metersPerAu;
     space[system.name].position.z = space[system.name].position.z / metersPerAu;
-    if (system.position.x < space.bbox.min.x) {
-        space.bbox.min.x = system.position.x;
+    if (space[system.name].position.x < space.bbox.min.x) {
+        space.bbox.min.x = space[system.name].position.x;
     }
-    if (system.position.y < space.bbox.min.y) {
-        space.bbox.min.y = system.position.y;
+    if (space[system.name].position.y < space.bbox.min.y) {
+        space.bbox.min.y = space[system.name].position.y;
     }
-    if (system.position.z < space.bbox.min.z) {
-        space.bbox.min.z = system.position.z;
+    if (space[system.name].position.z < space.bbox.min.z) {
+        space.bbox.min.z = space[system.name].position.z;
     }
-    if (system.position.x > space.bbox.max.x) {
-        space.bbox.max.x = system.position.x;
+    if (space[system.name].position.x > space.bbox.max.x) {
+        space.bbox.max.x = space[system.name].position.x;
     }
-    if (system.position.y > space.bbox.max.y) {
-        space.bbox.max.y = system.position.y;
+    if (space[system.name].position.y > space.bbox.max.y) {
+        space.bbox.max.y = space[system.name].position.y;
     }
-    if (system.position.z > space.bbox.max.z) {
-        space.bbox.max.z = system.position.z;
+    if (space[system.name].position.z > space.bbox.max.z) {
+        space.bbox.max.z = space[system.name].position.z;
     }
 }
 function InitializeUniverse() {
 
     gUniverse.NewEden = new Object();
+    gUniverse.NewEden.name = "New Eden";
     gUniverse.NewEden.hisec = new Object();
     gUniverse.NewEden.losec = new Object();
     gUniverse.NewEden.nullsec = new Object();
     gUniverse.WormholeSpace = new Object();
+    gUniverse.WormholeSpace.name = "Wormhole Space";
     gUniverse.ShatteredWormholeSpace = new Object();
+    gUniverse.ShatteredWormholeSpace.name = "Shattered Wormhole Space";
     gUniverse.VSpace = new Object();
+    gUniverse.VSpace.name = "V Space";
     gUniverse.ADSpace = new Object();
+    gUniverse.ADSpace.name = "AD Space";
 
 
     for (const system_name in gSystemMap) {
@@ -218,12 +223,30 @@ function InitializeMenus() {
     for (const system_name in gSystemMap) {
         var system = gSystemMap[system_name];
         var itemText = system.name
-            + " (" + system.position.x.toFixed(4)
-            + "," + system.position.y.toFixed(4)
-            + "," + system.position.z.toFixed(4)
+            + " (" + system.position.x.toFixed(2)
+            + "," + system.position.y.toFixed(2)
+            + "," + system.position.z.toFixed(2)
             + ")";
         AddMenuItem(system.systemType, itemText);
     }
+
+    for (const space_name in gUniverse) {
+        var menuItem = document.getElementById(space_name+"UL");
+
+
+        var itemText = gUniverse[space_name].name
+            + " (" + gUniverse[space_name].bbox.min.x.toFixed(2)
+            + "," + gUniverse[space_name].bbox.min.y.toFixed(2)
+            + "," + gUniverse[space_name].bbox.min.z.toFixed(2)
+            + ") - "
+            + " (" + gUniverse[space_name].bbox.max.x.toFixed(2)
+            + "," + gUniverse[space_name].bbox.max.y.toFixed(2)
+            + "," + gUniverse[space_name].bbox.max.z.toFixed(2)
+            + ")";
+
+        menuItem.innerHTML = itemText;
+    }
+
 }
 
 function AddMenuItem(parentMenuID, itemText) {
