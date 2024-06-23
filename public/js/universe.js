@@ -267,12 +267,10 @@ function InitializeUniverse(systems_json) {
         //Color
         let security = systems_json[system].security_status;
         var black = [0, 0, 0];
-        var purple = [1, 0, 1];
         var blue = [0, 0, 1];
         var cyan = [0, 1, 1];
         var green = [0, 1, 0];
         var yellow = [1, 1, 0];
-        var orange = [1, 0.5, 0];
         var red = [1, 0.6, 0.6];
         var darkRed = [1, 0.2, 0.2];
         var color = black;
@@ -335,7 +333,10 @@ function InitializeUniverse(systems_json) {
     }
     gUniverseScale = maxSize;
 
-
+    var purple = [1, 0, 1];
+    var orange = [1, 0.5, 0];
+    var gray = [0.5,0.5,0.5];
+    var color;
     for (const system_name in gSystemMap) {
         var system = gSystemMap[system_name];
 
@@ -355,21 +356,29 @@ function InitializeUniverse(systems_json) {
             system.system_id < 32000000) {
             if (system.system_id <= 31000006) {
                 systemType = "ShatteredWormholeSpace"
+                color = orange;
             } else if (system_name[1] == '0') {
                 systemType = "ShatteredWormholeSpace"
+                color = orange;
             } else {
                 systemType = "WormholeSpace";
+                color = purple;
             }
+            system.color = new BABYLON.Color3(color[0], color[1], color[2]);
             AddSystemToSpace(gUniverse[systemType], system, systemType)
         }
         else if (system.system_id > 32000000 &&
             system.system_id < 33000000) {
             systemType = "ADSpace";
+            color = gray;
+            system.color = new BABYLON.Color3(color[0], color[1], color[2]);
             AddSystemToSpace(gUniverse[systemType], system, systemType)
         }
         else if (system.system_id > 34000000 &&
             system.system_id < 35000000) {
             systemType = "VSpace";
+            color = gray;
+            system.color = new BABYLON.Color3(color[0], color[1], color[2]);
             AddSystemToSpace(gUniverse[systemType], system, systemType)
         }
     }
