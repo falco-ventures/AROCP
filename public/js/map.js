@@ -114,6 +114,46 @@ function create_hover_sphere(name) {
     gHoverPlaneTexture = planeTexture;
 }
 
+function create_region_sphere(region) {
+    var sphere = BABYLON.MeshBuilder.CreateSphere("RegionSphere", { diameter: 0.5, segments: 32 }, Get3DScene());
+    // sphere.isPickable = false;
+    
+    sphere.material = new BABYLON.StandardMaterial("SphereMaterial2", Get3DScene());
+    sphere.material.backFaceCulling = false;
+    sphere.material.disableLighting = true;
+    sphere.material.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+
+
+    var plane = BABYLON.MeshBuilder.CreatePlane("HoverPlane", { width: 20, height: 10 }, Get3DScene());
+    plane.isPickable = false;
+    var planeMaterial = new BABYLON.StandardMaterial("HoverMaterial", Get3DScene());
+    var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("HoverTexture", { width: 512, height: 256 }, Get3DScene());
+    ;
+    planeTexture.hasAlpha = true;
+    var label = region.name;
+    var ctx = planeTexture.getContext();
+    ctx.font = "bold 44px Arial";
+    const textWidth = ctx.measureText(label).width;
+    var x = (512 - textWidth)/2;
+    planeTexture.drawText(label, x, 256, "bold 44px Arial", "white", "transparent", true, true);
+
+    planeMaterial.backFaceCulling = false;
+    planeMaterial.disableLighting = true;
+    planeMaterial.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    planeMaterial.diffuseTexture = planeTexture;
+    planeMaterial.opacityTexture = planeTexture;
+
+    plane.material = planeMaterial;
+    plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+    
+    
+    sphere.position = Get3DPositionFromRegion(region);
+
+    plane.position.x = sphere.position.x;
+    plane.position.y = sphere.position.y + 5.25;
+    plane.position.z = sphere.position.z;
+}
+
 
 function vecToLocal(vector, mesh) {
     var m = mesh.getWorldMatrix();
@@ -196,6 +236,14 @@ var createScene = async function (systems_json) {
     create_hover_sphere("Thera");
     select_system("Thera")
     hover_system("None");
+
+    var keys = Object.keys(gRegions);
+    keys.sort();
+    for (var i = 0; i < keys.length; ++i) {
+        var region = gRegions[keys[i]];
+        create_region_sphere(region);
+
+    }
     //Mouse
     scene.onPointerMove = function () {
         mousemovef();

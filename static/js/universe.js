@@ -250,6 +250,14 @@ function Get3DPositionFromSystem(system_data) {
     offsetPosition.z = system_data.position.z - space.bbox.center.z + space.offset.z;
     return new BABYLON.Vector3(offsetPosition.x, offsetPosition.y, offsetPosition.z);
 }
+function Get3DPositionFromRegion(region_data) {
+    var space = gUniverse[region_data.space];
+    var offsetPosition = new Object();
+    offsetPosition.x = region_data.position.x - space.bbox.center.x + space.offset.x;
+    offsetPosition.y = region_data.position.y - space.bbox.center.y + space.offset.y;
+    offsetPosition.z = region_data.position.z - space.bbox.center.z + space.offset.z;
+    return new BABYLON.Vector3(offsetPosition.x, offsetPosition.y, offsetPosition.z);
+}
 
 function hover_system(systemName) {
     var systemData = gSystemMap[systemName];
@@ -528,7 +536,29 @@ function InitializeUniverse(systems_json) {
         gUniverse[space_name].bbox.center.x = (gUniverse[space_name].bbox.min.x + gUniverse[space_name].bbox.max.x) / 2;
         gUniverse[space_name].bbox.center.y = (gUniverse[space_name].bbox.min.y + gUniverse[space_name].bbox.max.y) / 2;
         gUniverse[space_name].bbox.center.z = (gUniverse[space_name].bbox.min.z + gUniverse[space_name].bbox.max.z) / 2;
+        
+        for (const region_name in gRegions) {
+            var region = gRegions[region_name];
+            if(region.space == space_name) {
+                gUniverse[space_name][region.name].position = new BABYLON.Vector3(0,0,0);
+                var numConst=0;
+                for (const constellation_name in gConstellations) {
+                    var constellation = gConstellations[constellation_name];
+                    if(constellation.region_id == region.region_id) {
+                    gUniverse[space_name][region.name].position.x += constellation.position.x;
+                    gUniverse[space_name][region.name].position.y += constellation.position.y;
+                    gUniverse[space_name][region.name].position.z += constellation.position.z;
+                    numConst++;
+                    }
+                }
+                gUniverse[space_name][region.name].position.x /= numConst;
+                gUniverse[space_name][region.name].position.y /= numConst;
+                gUniverse[space_name][region.name].position.z /= numConst;
+            }
+
+        }
     }
+
 }
 
 
