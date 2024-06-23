@@ -94,7 +94,7 @@ function sendCommand(commandName, paramString, callback, command_type, headers, 
 
 function verification_callback(data, loginCredentials) {
     if (data != undefined) {
-        console.log("Requested " + loginCredentials.access_token + " and got " + data.responseText);
+        console.log("Requested  and got " + data.responseText);
 
         // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
         /*
@@ -161,7 +161,7 @@ function authorize_character_code(code) {
     var headers = {};
     headers["Content-Type"] = "application/json";
     var callback_data = code;
-    sendCommand(base, paramString, authorization_callback, command_type, headers, null, callback_data);
+    sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
 }
 
 function download_character_info() {
