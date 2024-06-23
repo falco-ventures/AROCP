@@ -136,12 +136,6 @@ function authorization_callback(data, callback_data) {
 function authorize_character_code_local(code) {
     //See: https://developers.eveonline.com/blog/article/sso-to-authenticated-calls
     //And: https://developers.eveonline.com/applications/details/84209#app-section-details
-    // console.log("Requesting character data for: " + code)
-    // curl -XPOST -H "Content-Type:application/json" -H "Authorization:Basic Y2xpZW50X2lkOmNsaWVudHNlY3JldDE=" -d '{"grant_type":"authorization_code", "code":"ckEZIa6JUOdoN6ijmqBI...qgpU-SmPsZ0"}' https://login.eveonline.com/oauth/token
-    var auth = "ZGI4ZTMzOTg5N2JiNDE3Zjk3MWZmMDdlZjYxN2U5Njc6TXNMZWxlZTFMcmo5eG5zYXhHdFozMW5ITHVyRG9VT1J2NjZkeU1hdA==";
-
-    // var auth = btoa("db8e339897bb417f971ff07ef617e967:MsLelee1Lrj9xnsaxGtZ31nHLurDoUORv66dyMat");
-    // console.log(auth);
     var auth = "ZGI4ZTMzOTg5N2JiNDE3Zjk3MWZmMDdlZjYxN2U5Njc6TXNMZWxlZTFMcmo5eG5zYXhHdFozMW5ITHVyRG9VT1J2NjZkeU1hdA==";
     var base = "https://login.eveonline.com/oauth/token";
     var paramString = "";
