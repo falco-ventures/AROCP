@@ -331,7 +331,7 @@ function InitializeUniverse(systems_json) {
     gUniverse.ShatteredWormholeSpace = new Object();
     gUniverse.ShatteredWormholeSpace.name = "Shattered Wormhole Space";
     gUniverse.ShatteredWormholeSpace.systems = new Object();
-    gUniverse.ShatteredWormholeSpace.offset = { x: 0, y: 30, z: 0 };
+    gUniverse.ShatteredWormholeSpace.offset = { x: 0, y: -30, z: 0 };
     gUniverse.ShatteredWormholeSpace.pcs = new BABYLON.PointsCloudSystem("Shattered Wormhole Space", 30, g3DScene);
 
     gUniverse.VSpace = new Object();
