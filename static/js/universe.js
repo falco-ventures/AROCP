@@ -22,6 +22,7 @@ var gSystems = new Object();
 var gUniverseMin = new Object();
 var gUniverseMax = new Object();
 
+
 gUniverseMin.x = 0;
 gUniverseMin.y = 0;
 gUniverseMin.z = 0;

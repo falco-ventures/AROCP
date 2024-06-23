@@ -99,11 +99,12 @@ function verification_callback(data, loginCredentials) {
         
         try {
             var characterInfo = JSON.parse(data.responseText);
-
-            characterInfo.refresh_token = loginCredentials.refresh_token;
-            alert("Welcome " + characterInfo.CharacterName + " ID: " + characterInfo.CharacterID);
-            console.log(JSON.stringify(characterInfo));
-            AddCharacter(characterInfo);
+            if(characterInfo != undefined && characterInfo.CharacterName != undefined) {
+            // characterInfo.refresh_token = loginCredentials.refresh_token;
+            // alert("Welcome " + characterInfo.CharacterName + " ID: " + characterInfo.CharacterID);
+            // console.log(JSON.stringify(characterInfo));
+            // AddVerifiedCharacter(characterInfo);
+            }
         } catch (e) {
 
         }
@@ -173,12 +174,27 @@ function download_character_info() {
             authorize_character_code(gCharacterCodes[i]);
     }
 }
-
+function loadExternalFile(file, callback) {
+    var responseHandled = false;
+    var rawFile = new XMLHttpRequest();
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function () {
+        if (rawFile.readyState === 4 && !responseHandled) {
+            responseHandled = true;
+            delete rawFile;
+            callback(rawFile.responseText);
+        }
+    }
+    rawFile.send(null);
+}
 function main() {
     //Make sure the Character ID list is up to date
     // check_cookie();
     parse_my_url();
     download_character_info();
+
+    InitializeUniverse();
 }
 
 main();

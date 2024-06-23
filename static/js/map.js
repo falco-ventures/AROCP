@@ -16,7 +16,7 @@ var gMeshes = new Array();
 var canvas = document.getElementById("renderCanvas");
 var engine = null;
 var sceneToRender = null;
-window.scene = null;
+// var scene = null;
 var SPS = null;
 var startRenderLoop = function (engine, canvas) {
     engine.runRenderLoop(function () {
@@ -30,20 +30,7 @@ var startRenderLoop = function (engine, canvas) {
 }
 
 var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false }); }
-function loadExternalFile(file, callback) {
-    var responseHandled = false;
-    var rawFile = new XMLHttpRequest();
-    rawFile.overrideMimeType("application/json");
-    rawFile.open("GET", file, true);
-    rawFile.onreadystatechange = function () {
-        if (rawFile.readyState === 4 && !responseHandled) {
-            responseHandled = true;
-            delete rawFile;
-            callback(rawFile.responseText);
-        }
-    }
-    rawFile.send(null);
-}
+
 
 function create_selection_sphere(name) {
     if (gSelectionSphere != null) {
@@ -111,10 +98,10 @@ function create_hover_sphere(name) {
 
 function hover_callback() {
     var galaxyName = this.innerHTML;
-    var galaxyData = universe[galaxyName];
+    var galaxyData = gUniverse[galaxyName];
     var label = galaxyName;
-    var selectedGalaxyData = universe[gSelectedGalaxy];
-    // gUniverseScale = gJitaCenter[0] / (universe["Jita"].position.x);
+    var selectedGalaxyData = gUniverse[gSelectedGalaxy];
+    // gUniverseScale = gJitaCenter[0] / (gUniverse["Jita"].position.x);
     if (galaxyData != undefined && selectedGalaxyData != undefined) {
         var dx = (galaxyData.position.x - selectedGalaxyData.position.x);
         var dy = (galaxyData.position.y - selectedGalaxyData.position.y);
@@ -143,7 +130,7 @@ function click_callback() {
     //hover_callback();
 
     var galaxyName = this.innerHTML;
-    var galaxyData = universe[galaxyName];
+    var galaxyData = gUniverse[galaxyName];
     gSelectedGalaxy = galaxyName;
 
     create_selection_sphere(galaxyName);
@@ -539,6 +526,7 @@ var createScene = async function (universe) {
         }
     }
     gInitialized = true;
+    gUniverse = universe;
     return scene;
 }
 
@@ -612,9 +600,9 @@ function startApplication(data) {
                 return createDefaultEngine();
             }
         }
-        window.engine = await asyncEngineCreation();
+        engine= await asyncEngineCreation();
         if (!engine) throw 'engine should not be null.';
-        window.scene = createScene(data);
+        scene = createScene(data);
         startRenderLoop(engine, canvas);
     };
     initFunction().then(() => {
