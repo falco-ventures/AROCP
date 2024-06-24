@@ -82,7 +82,8 @@ $headers_string = json_encode($headers);
 $get_result = CurlSendGetRequest("https://esi.evetech.net/verify", $bearer, );
 $result_object = json_decode($get_result);     
 $result_object->{'refresh_token'} = $result->{'refresh_token'};       
-$result_object->{'code'} = $result->{'code'};                                                          
+$result_object->{'code'} = $result->{'code'};    
+$result_object->{'access_token'} = $result->{'access_token'};                             
 $result_json = json_encode($result_object);     
 
 header('Access-Control-Allow-Origin: *');

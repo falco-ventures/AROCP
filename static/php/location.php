@@ -55,7 +55,7 @@ function CurlSendPostRequest($url,$request)
                 CURLOPT_SSL_VERIFYPEER => false,        //
                 CURLOPT_VERBOSE        => 1,
                 CURLOPT_HTTPHEADER     => array(
-                    // "Authorization: Bearer $token",
+                    "Authorization: Bearer $token",
                     "Content-Type: application/json"
                 )
 
@@ -73,7 +73,7 @@ function CurlSendPostRequest($url,$request)
 $bearer = $_GET['code'];
 $character = $_GET['character'];
 
-$get_result = CurlSendGetRequest("https://esi.evetech.net/latest/characters/$character/location/?token=$bearer", $bearer);    
+$get_result = CurlSendGetRequest("https://esi.evetech.net/latest/characters/$character/location/?datasource=tranquility", $bearer);    
 
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
