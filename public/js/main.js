@@ -91,19 +91,20 @@ function sendCommand(commandName, paramString, callback, command_type, headers, 
     } else
         req.send();
 }
+var gCharacterInfo = new Array();
+var loginCredentials;
 
-function verification_callback(data, loginCredentials) {
+function ValidateCorp(data) {
     if (data != undefined) {
+        console.log("Requested Character Info and got " + data.responseText);
 
-        // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
-        
         try {
             var characterInfo = JSON.parse(data.responseText);
-            if(characterInfo != undefined && characterInfo.CharacterName != undefined) {
-            // characterInfo.refresh_token = loginCredentials.refresh_token;
-            // alert("Welcome " + characterInfo.CharacterName + " ID: " + characterInfo.CharacterID);
-            // console.log(JSON.stringify(characterInfo));
-            // AddVerifiedCharacter(characterInfo);
+            var character = gCharacterInfo[0];
+            character.characterInfo = characterInfo;
+            // alert(character.characterInfo.cororation_id)
+            if(characterInfo.corporation_id == 98770774) {
+                document.getElementById("logo").style.width = '0';
             }
         } catch (e) {
 
@@ -112,13 +113,130 @@ function verification_callback(data, loginCredentials) {
     }
 }
 
+function ProcessCharacterRoute(data) {
+    if (data != undefined) {
+        console.log("Requested Character Route and got " + data.responseText);
+
+        try {
+            var character = gCharacterInfo[0];
+            var characterRouteInfo = JSON.parse(data.responseText);
+            var system = gSystemsList[characterRouteInfo[characterRouteInfo.length-1]];
+
+            var scoutData = theraConnectedSystems[characterRouteInfo[characterRouteInfo.length-1]];
+
+            var wormholeSig = "( " + system.security_status.toFixed(1) + " " + (scoutData.out_signature)
+                + " - " + (scoutData.in_signature)
+                + ")";
+
+            // console.log(characterRouteInfo);
+            var destString = system.name + " " + wormholeSig + " Jumps: " + characterRouteInfo.length;
+
+            AddMenuItem("Characters", destString);
+
+            
+
+        } catch (e) {
+
+        }
+    }
+}
+function ProcessCharacterLocation(data) {
+    if (data != undefined) {
+        console.log("Requested Character Info and got " + data.responseText);
+
+        try {
+            var characterLocationInfo = JSON.parse(data.responseText);
+            var character = gCharacterInfo[0];
+            character.location = characterLocationInfo;
+            var system = gSystemsList[characterLocationInfo.solar_system_id];
+            character.system = system;
+            var itemText = system.name
+                + " (" + character.CharacterName + ": " + (system.position.x).toFixed(2)
+                + "," + (system.position.y).toFixed(2)
+                + "," + (system.position.z).toFixed(2)
+                + ")";
+
+            AddMenuItem("Characters", itemText);
+
+            create_character_sphere(character);
+
+
+            for (const system_id in theraConnectedSystems) {
+                var destSystem = gSystemsList[system_id];
+                if (destSystem.systemType == "NewEden") {
+                    var base = "https://esi.evetech.net/latest/route/" + system.system_id + "/" + destSystem.system_id + "/";
+                    var paramString = "datasource=tranquility";
+                    var command_type = "GET";
+                    var headers = {};
+                    headers["Content-Type"] = "application/json";
+                    headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+
+                    sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, loginCredentials);
+
+                }
+
+            }
+            var base = "https://esi.evetech.net/latest/characters/" + character.CharacterID + "/";
+            var paramString = "datasource=tranquility";
+            var command_type = "GET";
+            var headers = {};
+            headers["Content-Type"] = "application/json";
+            headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+            sendCommand(base, paramString, ValidateCorp, command_type, headers, null, loginCredentials);
+        } catch (e) {
+
+        }
+
+    }
+}
+function verification_callback(data, loginCredentials) {
+    if (data != undefined) {
+
+        // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
+        /*
+        {
+            "CharacterID": 2122278309,
+            "CharacterName": "AeroPete",
+            "ExpiresOn": "2024-06-24T16:35:16",
+            "Scopes": "publicData esi-location.read_location.v1 esi-location.read_ship_type.v1 esi-skills.read_skills.v1 esi-skills.read_skillqueue.v1 esi-universe.read_structures.v1 esi-ui.write_waypoint.v1 esi-fittings.read_fittings.v1 esi-fittings.write_fittings.v1 esi-location.read_online.v1 esi-clones.read_implants.v1 esi-characters.read_fatigue.v1",
+            "TokenType": "Character",
+            "CharacterOwnerHash": "CA2DmP2Dx3e72JLAV9pf+tGU4qU=",
+            "IntellectualProperty": "EVE"
+        }
+        */
+        try {
+            var characterInfo = JSON.parse(data.responseText);
+            if (characterInfo != undefined && characterInfo.CharacterName != undefined) {
+                // characterInfo.refresh_token = loginCredentials.refresh_token;
+                // alert("Welcome " + characterInfo.CharacterName + " ID: " + characterInfo.CharacterID);
+                console.log(JSON.stringify(characterInfo));
+                // AddVerifiedCharacter(characterInfo);
+
+                https://esi.evetech.net/latest/characters/2122278309/location/?datasource=tranquility
+                gCharacterInfo.push(characterInfo)
+
+                var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
+                var paramString = "datasource=tranquility";
+                var command_type = "GET";
+                var headers = {};
+                headers["Content-Type"] = "application/json";
+                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+
+                sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+            }
+        } catch (e) {
+
+        }
+
+    }
+}
 function authorization_callback(data, callback_data) {
     if (data != undefined) {
         console.log("Requested " + callback_data.code + " and got " + data.responseText);
 
         // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
         try {
-            var loginCredentials = JSON.parse(data.responseText);
+            loginCredentials = JSON.parse(data.responseText);
             var base = "https://esi.evetech.net/verify/";
             var paramString = "";
             var command_type = "GET";

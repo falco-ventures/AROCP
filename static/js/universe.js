@@ -640,6 +640,7 @@ function InitializeUniverse(systems_json) {
 var gScoutData = new Array();
 var gScoutLines = null;
 var gScoutCount = 1;
+var theraConnectedSystems = new Object();
 function ProcessScouts(response) {
     if (response == undefined || response == null)
         return;
@@ -652,7 +653,6 @@ function ProcessScouts(response) {
 
 
         var wormholeSystems = new Array();
-        var theraConnectedSystems = new Object();
         var thera = null;
         for (const scout_entry in gScoutData) {
             var scout_data = gScoutData[scout_entry];
@@ -763,8 +763,8 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             myColorLine = new Array();
-            myColorLine.push(ColorFromSecurity(gSystemsList[srcScout.in_system_id].security_status));
-            myColorLine.push(ColorFromSecurity(gSystemsList[dstScout.in_system_id].security_status));
+            myColorLine.push(new BABYLON.Color4(0,1,0,1));
+            myColorLine.push(new BABYLON.Color4(0,1,0,1));
             myColors.push(myColorLine);
 
             myLine = new Array();
@@ -810,7 +810,7 @@ function ProcessScouts(response) {
                 + ")";
             var system = gSystemsList[system_id];
             var destString = system.name + wormholeSig + " Time: " + scoutData.remaining_hours;
-
+            
             if (system.security_status >= 0.5) {
                 AddMenuItem("Thera1", destString);
             } else if (system.security_status >= 0.0) {
@@ -925,6 +925,7 @@ function InitializeMenus() {
 
         });
     }
+
 
 }
 

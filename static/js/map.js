@@ -33,6 +33,44 @@ function Get3DScene() {
 var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false }); }
 
 
+
+function create_character_sphere(character) {
+
+    var sphere = BABYLON.MeshBuilder.CreateSphere("WormholeSphere", { diameter: 0.5, segments: 32 }, Get3DScene());
+
+    sphere.material = new BABYLON.StandardMaterial("SphereMaterial", Get3DScene());
+    sphere.material.backFaceCulling = false;
+    sphere.material.disableLighting = true;
+    sphere.material.emissiveColor = new BABYLON.Color3(0.5, 0.5, 1.0);
+    
+    var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 20, height: 10 }, Get3DScene());
+    var planeMaterial = new BABYLON.StandardMaterial("SelectionMaterial", Get3DScene());
+    var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("SelectionTexture", { width: 512, height: 256 }, Get3DScene());
+    planeTexture.getContext();
+    planeTexture.hasAlpha = true;
+    
+    var ctx = planeTexture.getContext();
+    ctx.font = "bold 44px Arial";
+    const textWidth = ctx.measureText(character.CharacterName).width;
+    var x = (512 - textWidth)/2;
+
+    planeTexture.drawText(character.CharacterName, x, 256, "bold 44px Arial", "white", "transparent", true, true);
+
+    planeMaterial.backFaceCulling = false;
+    planeMaterial.disableLighting = true;
+    planeMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.5, 1.0);
+    planeMaterial.diffuseTexture = planeTexture;
+    planeMaterial.opacityTexture = planeTexture;
+
+    plane.material = planeMaterial;
+    plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+
+    sphere.position = Get3DPositionFromSystem(character.system);
+
+    plane.position.x = sphere.position.x;
+    plane.position.y = sphere.position.y + 10;
+    plane.position.z = sphere.position.z;
+}
 function create_selection_sphere(name) {
     if (gSelectionSphere != null) {
         gSelectionSphere.dispose();
