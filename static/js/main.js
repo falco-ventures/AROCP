@@ -164,15 +164,31 @@ function ProcessCharacterLocation(data) {
             for (const system_id in theraConnectedSystems) {
                 var destSystem = gSystemsList[system_id];
                 if (destSystem.systemType == "NewEden") {
-                    var base = "https://esi.evetech.net/latest/route/" + system.system_id + "/" + destSystem.system_id + "/";
-                    var paramString = "datasource=tranquility";
-                    var command_type = "GET";
-                    var headers = {};
-                    headers["Content-Type"] = "application/json";
-                    headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
-                    sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, loginCredentials);
+                    if (window.location.href.includes("localhost")) {
+                        var base = "https://esi.evetech.net/latest/route/" + system.system_id + "/" + destSystem.system_id + "/";
+                        var paramString = "datasource=tranquility";
+                        var command_type = "GET";
+                        var headers = {};
+                        headers["Content-Type"] = "application/json";
+                        headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
+                        sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, loginCredentials);
+                    } else {
+
+                        var base = "https://instacardapp.com/AROCP/public/php/route.php";
+                        var paramString = "code=" + characterInfo.access_token
+                            + "&src=" + system.system_id
+                            + "&dst=" + destSystem.system_id;
+                        var command_type = "GET";
+                        var headers = {};
+                        headers["Content-Type"] = "application/json";
+                        headers["Authorization"] = "Bearer " + characterInfo.access_token;
+
+                        sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, characterInfo);
+
+
+                    }
                 }
 
             }
@@ -234,13 +250,13 @@ function verification_callback(data, code) {
                     sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
                 } else {
                     var base = "https://instacardapp.com/AROCP/public/php/location.php";
-                    var paramString = "code=" +  characterInfo.access_token + "&character=" + characterInfo.CharacterID;
+                    var paramString = "code=" + characterInfo.access_token + "&character=" + characterInfo.CharacterID;
                     var command_type = "GET";
                     var headers = {};
                     headers["Content-Type"] = "application/json";
                     headers["Authorization"] = "Bearer " + characterInfo.access_token;
 
-                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null,  characterInfo);
+                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, characterInfo);
 
                 }
 
@@ -341,7 +357,7 @@ function main() {
     //Make sure the Character ID list is up to date
     // check_cookie();
     parse_my_url();
-    
+
 
     LoadSystemsJSON();
 }
