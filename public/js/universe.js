@@ -626,10 +626,13 @@ function InitializeUniverse(systems_json) {
 
 var gScoutData = new Array();
 var gScoutLines = null;
-
+var gScoutCount = 1;
 function ProcessScouts(response) {
-    
+    if(response == undefined || response == null)
+        return;
     gScoutData = JSON.parse(response.responseText);
+    var scountString = "Scouts";
+    gScoutCount++;
     if (gScoutData != null) {
         var myLines = new Array();
         var myColors = new Array();
@@ -638,7 +641,9 @@ function ProcessScouts(response) {
             var scout_data = gScoutData[scout_entry];
             // var itemText = gate.name;
             var srcSystem = gSystemsList[scout_data.in_system_id];
+            create_wormhole_sphere(srcSystem);
             var destSystem = gSystemsList[scout_data.out_system_id];
+            create_wormhole_sphere(destSystem);
             // console.log( "Gate: " + gate.name + 
             //                 " from " + srcSystem.name +
             //                 " to " + destSystem.name
@@ -655,12 +660,28 @@ function ProcessScouts(response) {
             myColorLine.push(new BABYLON.Color4(0.25,0.25,0.25,0.5));
             myColors.push(myColorLine);
 
+            var groupString = "Connection " + myColors.length;
+            AddScoutMenu(scountString, groupString, groupString);
+
+            var srcText = srcSystem.name
+                + " (" + (srcSystem.position.x).toFixed(2)
+                + "," + (srcSystem.position.y).toFixed(2)
+                + "," + (srcSystem.position.z).toFixed(2)
+                + ")";
+            AddMenuItem(groupString, srcText);
+            var dstText = destSystem.name
+                + " (" + (destSystem.position.x).toFixed(2)
+                + "," + (destSystem.position.y).toFixed(2)
+                + "," + (destSystem.position.z).toFixed(2)
+                + ")";
+            AddMenuItem(groupString, dstText);
+
         }
         if(gScoutLines != null) {
             gScoutLines.dispose();
         }
         gScoutLines = create_gate_lines(myLines, myColors);
-
+        
     }
 
 }
@@ -671,9 +692,10 @@ function InitializeEveScout() {
     const myFunction = () => {
         sendCommand("https://api.eve-scout.com/v2/public/signatures", "", ProcessScouts);
     }
-    };
     
-    setInterval(myFunction, 10000); // Repeat myFunction every 2 seconds
+    
+    // setInterval(myFunction, 10000); // Repeat myFunction every 2 seconds
+}
 
 function InitializeGates() {
     var myLines = new Array();
@@ -763,6 +785,32 @@ function AddMenuItem(parentMenuID, itemText) {
     ul.appendChild(li);
 }
 
+
+function AddScoutMenu(parentMenuID, region_name, itemText) {
+    var ul = document.getElementById(parentMenuID);
+
+    var li = document.createElement("li");
+    var span = document.createElement("span");
+
+    span.class = "box";
+    span.id = region_name + "UL";
+    span.innerHTML = itemText;
+    li.appendChild(span);
+
+    var newul = document.createElement("ul");
+    newul.class = "nested";
+    newul.id = region_name;
+    li.appendChild(newul);
+
+    li.addEventListener("click", function () {
+        this.parentElement.querySelector("nested").classList.toggle("active");
+        this.classList.toggle("check-box");
+
+
+
+    });
+    ul.appendChild(li);
+}
 
 function AddRegionMenu(parentMenuID, region_name, itemText) {
     var ul = document.getElementById(parentMenuID);

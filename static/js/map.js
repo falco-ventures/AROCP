@@ -75,6 +75,45 @@ function create_selection_sphere(name) {
     gSelectionPlaneTexture.visible = true;
 }
 
+
+function create_wormhole_sphere(system) {
+
+    var sphere = BABYLON.MeshBuilder.CreateSphere("WormholeSphere", { diameter: 0.5, segments: 32 }, Get3DScene());
+
+    sphere.material = new BABYLON.StandardMaterial("SphereMaterial", Get3DScene());
+    sphere.material.backFaceCulling = false;
+    sphere.material.disableLighting = true;
+    sphere.material.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    
+    var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 20, height: 10 }, Get3DScene());
+    var planeMaterial = new BABYLON.StandardMaterial("SelectionMaterial", Get3DScene());
+    var planeTexture = BABYLON.DynamicTexture = new BABYLON.DynamicTexture("SelectionTexture", { width: 512, height: 256 }, Get3DScene());
+    planeTexture.getContext();
+    planeTexture.hasAlpha = true;
+    
+    var ctx = planeTexture.getContext();
+    ctx.font = "bold 44px Arial";
+    const textWidth = ctx.measureText(name).width;
+    var x = (512 - textWidth)/2;
+
+    planeTexture.drawText(system.name, x, 256, "bold 44px Arial", "white", "transparent", true, true);
+
+    planeMaterial.backFaceCulling = false;
+    planeMaterial.disableLighting = true;
+    planeMaterial.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    planeMaterial.diffuseTexture = planeTexture;
+    planeMaterial.opacityTexture = planeTexture;
+
+    plane.material = planeMaterial;
+    plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+
+    sphere.position = Get3DPositionFromSystem(system);
+
+    plane.position.x = sphere.position.x;
+    plane.position.y = sphere.position.y + 5.25;
+    plane.position.z = sphere.position.z;
+}
+
 function create_hover_sphere(name) {
     var sphere = BABYLON.MeshBuilder.CreateSphere("HoverSphere", { diameter: 0.5, segments: 32 }, Get3DScene());
     // sphere.isPickable = false;
