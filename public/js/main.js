@@ -99,7 +99,7 @@ function ValidateCorp(data) {
         console.log("Requested Character Info and got " + data.responseText);
 
         try {
-            var characterInfo = JSON..parse(JSON.parse(data.responseText));
+            var characterInfo = JSON.parse(data.responseText);
             var character = gCharacterInfo[0];
             character.characterInfo = characterInfo;
             // alert(character.characterInfo.cororation_id)
