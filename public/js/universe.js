@@ -838,6 +838,7 @@ function ProcessScouts(response) {
 
     }
 
+    download_character_info();
 }
 
 function InitializeEveScout() {
@@ -878,7 +879,6 @@ function InitializeGates() {
 
     }
     create_gate_lines(myLines, myColors);
-    InitializeEveScout();
 }
 
 
