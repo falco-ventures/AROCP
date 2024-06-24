@@ -219,8 +219,8 @@ function verification_callback(data, loginCredentials) {
                 https://esi.evetech.net/latest/characters/2122278309/location/?datasource=tranquility
                 gCharacterInfo.push(characterInfo)
 
-                var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
-                var paramString = "datasource=tranquility";
+                var base = "https://instacardapp.com/AROCP/public/php/location.php";
+                var paramString = "code=" + loginCredentials.access_token + "&character="+characterInfo.CharacterID;
                 var command_type = "GET";
                 var headers = {};
                 headers["Content-Type"] = "application/json";
