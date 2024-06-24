@@ -634,7 +634,7 @@ var gScoutData = new Array();
 var gScoutLines = null;
 var gScoutCount = 1;
 function ProcessScouts(response) {
-    if(response == undefined || response == null)
+    if (response == undefined || response == null)
         return;
     gScoutData = JSON.parse(response.responseText);
     var scountString = "Scouts";
@@ -642,10 +642,11 @@ function ProcessScouts(response) {
     if (gScoutData != null) {
         var myLines = new Array();
         var myColors = new Array();
-        
-        
-        var wormholeSystems = new Array();
 
+
+        var wormholeSystems = new Array();
+        var theraConnectedSystems = new Object();
+        var thera = null;
         for (const scout_entry in gScoutData) {
             var scout_data = gScoutData[scout_entry];
             // var itemText = gate.name;
@@ -653,18 +654,25 @@ function ProcessScouts(response) {
             create_wormhole_sphere(srcSystem);
             var destSystem = gSystemsList[scout_data.out_system_id];
             create_wormhole_sphere(destSystem);
-            
-            
+
+            if (srcSystem.name == "Thera") {
+                thera = srcSystem;
+                theraConnectedSystems[destSystem.system_id] = scout_data.out_signature;
+            }
+            if (destSystem.name == "Thera") {
+                thera = destSystem;
+                theraConnectedSystems[srcSystem.system_id] = scout_data.in_signature;
+            }
             //Gather up all wormhole systems and a reference to their scout sonnection
-            if(srcSystem.systemType == "WormholeSpace") {
+            if (srcSystem.systemType == "WormholeSpace") {
                 srcSystem.scout_index = scout_entry;
                 wormholeSystems.push(srcSystem);
             }
-            if(destSystem.systemType == "WormholeSpace" && destSystem.name != "Thera") {
+            if (destSystem.systemType == "WormholeSpace" && destSystem.name != "Thera") {
                 destSystem.scout_index = scout_entry;
                 wormholeSystems.push(destSystem);
             }
-            
+
 
             //Array of lines to construct linesystem
             var myLine = new Array();
@@ -674,8 +682,8 @@ function ProcessScouts(response) {
 
             // [   new BABYLON.Color4(0, 1, 1, 1),
             var myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0.25,0.25,0.25,0.5));
-            myColorLine.push(new BABYLON.Color4(0.25,0.25,0.25,0.5));
+            myColorLine.push(new BABYLON.Color4(0.25, 0.25, 0.25, 0.5));
+            myColorLine.push(new BABYLON.Color4(0.25, 0.25, 0.25, 0.5));
             myColors.push(myColorLine);
 
             var groupString = "Connection " + myColors.length;
@@ -695,23 +703,22 @@ function ProcessScouts(response) {
             AddMenuItem(groupString, dstText);
 
         }
-        if(gScoutLines != null) {
+        if (gScoutLines != null) {
             gScoutLines.dispose();
         }
-        gScoutLines = create_gate_lines(myLines, myColors);
 
         var jumpableWormHoles = new Array();
-        
+
         for (const w1 in wormholeSystems) {
             // Loop through list and find pairs that are less that 8 ly apart
             var srcSystem = wormholeSystems[w1];
             for (const w2 in wormholeSystems) {
-                if( w1 == w2) {
+                if (w1 == w2) {
                     continue;
                 }
                 var destSystem = wormholeSystems[w2];
-                var d = CalculateSystemDistance(srcSystem,destSystem);
-                if( d < 8) {
+                var d = CalculateSystemDistance(srcSystem, destSystem);
+                if (d < 8) {
                     var jumpableHole = new Object();
                     jumpableHole.src = srcSystem.scout_index;
                     jumpableHole.dest = destSystem.scout_index;
@@ -739,8 +746,8 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             var myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0,1,1,0.5));
-            myColorLine.push(new BABYLON.Color4(0,1,1,0.5));
+            myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
+            myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
             myColors.push(myColorLine);
 
             myLine = new Array();
@@ -749,8 +756,8 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0,1,0,1.0));
-            myColorLine.push(new BABYLON.Color4(0,1,0,1.0));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
             myColors.push(myColorLine);
 
             myLine = new Array();
@@ -759,14 +766,14 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0,1,0,1.0));
-            myColorLine.push(new BABYLON.Color4(0,1,0,1.0));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
             myColors.push(myColorLine);
 
 
             create_gate_lines(myLines, myColors);
 
-            
+
             var groupString = "Jumpable Route " + w;
             AddScoutMenu("Jumps", groupString, groupString);
 
@@ -789,7 +796,7 @@ function ProcessScouts(response) {
                 + "," + (gSystemsList[dstScout.in_system_id].position.z).toFixed(2)
                 + ")";
             AddMenuItem(groupString, dstText);
-            
+
             var srcText = gSystemsList[dstScout.out_system_id].name
                 + " (" + (gSystemsList[dstScout.out_system_id].position.x).toFixed(2)
                 + "," + (gSystemsList[dstScout.out_system_id].position.y).toFixed(2)
@@ -797,9 +804,27 @@ function ProcessScouts(response) {
                 + ")";
             AddMenuItem(groupString, srcText);
         }
-        
 
-        
+        for (const system_id in theraConnectedSystems) {
+            var wormholeSig = theraConnectedSystems[system_id];
+            var system = gSystemsList[system_id];
+            if (system.security_status >= 0.5) {
+                var destString = system.name + " (" + wormholeSig + "," + system.security_status.toFixed(1) + ")";
+                AddMenuItem("Thera", destString);
+                var myLine = new Array();
+                myLine.push(Get3DPositionFromSystem(thera))
+                myLine.push(Get3DPositionFromSystem(system))
+                myLines.push(myLine);
+
+                var myColorLine = new Array();
+                myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
+                myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
+                myColors.push(myColorLine);
+            }
+        }
+        gScoutLines = create_gate_lines(myLines, myColors);
+
+
     }
 
 }
@@ -810,8 +835,8 @@ function InitializeEveScout() {
     const myFunction = () => {
         sendCommand("https://api.eve-scout.com/v2/public/signatures", "", ProcessScouts);
     }
-    
-    
+
+
     // setInterval(myFunction, 10000); // Repeat myFunction every 2 seconds
 }
 
@@ -836,8 +861,8 @@ function InitializeGates() {
 
         // [   new BABYLON.Color4(0, 1, 1, 1),
         var myColorLine = new Array();
-        myColorLine.push(new BABYLON.Color4(0.25,0.25,0.25,0.25));
-        myColorLine.push(new BABYLON.Color4(0.25,0.25,0.25,0.25));
+        myColorLine.push(new BABYLON.Color4(0.25, 0.25, 0.25, 0.25));
+        myColorLine.push(new BABYLON.Color4(0.25, 0.25, 0.25, 0.25));
         myColors.push(myColorLine);
 
     }
