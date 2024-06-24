@@ -73,7 +73,7 @@ function CurlSendPostRequest($url,$request)
 $bearer = $_GET['code'];
 $character = $_GET['character'];
 
-$get_result = CurlSendGetRequest("https://esi.evetech.net/latest/characters/$character/?datasource=tranquility", $bearer);    
+$get_result = CurlSendGetRequest("https://esi.evetech.net/latest/characters/$character/location/?datasource=tranquility", $bearer);    
 
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
