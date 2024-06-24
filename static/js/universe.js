@@ -303,6 +303,16 @@ function Get3DPositionFromRegion(region_data) {
     return new BABYLON.Vector3(offsetPosition.x, offsetPosition.y, offsetPosition.z);
 }
 
+function CalculateSystemDistance(s1, s2) {
+    var p1 = Get3DPositionFromSystem(s1);
+    var p2 = Get3DPositionFromSystem(s2);
+    var dx = (p1.x - p2.x);
+    var dy = (p1.y - p2.y);
+    var dz = (p1.z - p2.z);
+    var distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    return distance;
+}
+
 function hover_system(systemName) {
     var systemData = gSystemMap[systemName];
     if (systemData != undefined) {
@@ -311,12 +321,8 @@ function hover_system(systemName) {
         var p1 = Get3DPositionFromSystem(systemData);
         // gUniverseScale = gJitaCenter[0] / (gSystemMap["Jita"].position.x);
         if (selectedSystemData != undefined) {
-            var p2 = Get3DPositionFromSystem(selectedSystemData);
-            var dx = (p1.x - p2.x);
-            var dy = (p1.y - p2.y);
-            var dz = (p1.z - p2.z);
-            var distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-            label = systemName + " " + distance + " from " + selectedSystemData.name;
+            var distance = CalculateSystemDistance(systemData, selectedSystemData);
+            label = systemName + " " + distance.toFixed(1) + " from " + selectedSystemData.name;
         }
 
         gHoverPlaneTexture.clear();
@@ -324,7 +330,7 @@ function hover_system(systemName) {
         gHoverSphere.position = p1;
 
         gHoverPlane.position.x = gHoverSphere.position.x;
-        gHoverPlane.position.y = gHoverSphere.position.y + 5.25;
+        gHoverPlane.position.y = gHoverSphere.position.y + 8.25;
         gHoverPlane.position.z = gHoverSphere.position.z;
 
         gHoverPlane.material.opacityTexture = gHoverPlaneTexture;
@@ -347,7 +353,7 @@ function select_system(systemName) {
             gSelectionSphere.position = Get3DPositionFromSystem(gSystemMap[systemName]);
 
             gSelectionPlane.position.x = gSelectionSphere.position.x;
-            gSelectionPlane.position.y = gSelectionSphere.position.y + 5.25;
+            gSelectionPlane.position.y = gSelectionSphere.position.y + 8.25;
             gSelectionPlane.position.z = gSelectionSphere.position.z;
 
             gCamera.position.x = gSelectionSphere.position.x;
@@ -636,6 +642,9 @@ function ProcessScouts(response) {
     if (gScoutData != null) {
         var myLines = new Array();
         var myColors = new Array();
+        
+        
+        var wormholeSystems = new Array();
 
         for (const scout_entry in gScoutData) {
             var scout_data = gScoutData[scout_entry];
@@ -644,10 +653,19 @@ function ProcessScouts(response) {
             create_wormhole_sphere(srcSystem);
             var destSystem = gSystemsList[scout_data.out_system_id];
             create_wormhole_sphere(destSystem);
-            // console.log( "Gate: " + gate.name + 
-            //                 " from " + srcSystem.name +
-            //                 " to " + destSystem.name
-            //                 )
+            
+            
+            //Gather up all wormhole systems and a reference to their scout sonnection
+            if(srcSystem.systemType == "WormholeSpace") {
+                srcSystem.scout_index = scout_entry;
+                wormholeSystems.push(srcSystem);
+            }
+            if(destSystem.systemType == "WormholeSpace" && destSystem.name != "Thera") {
+                destSystem.scout_index = scout_entry;
+                wormholeSystems.push(destSystem);
+            }
+            
+
             //Array of lines to construct linesystem
             var myLine = new Array();
             myLine.push(Get3DPositionFromSystem(srcSystem))
@@ -681,6 +699,106 @@ function ProcessScouts(response) {
             gScoutLines.dispose();
         }
         gScoutLines = create_gate_lines(myLines, myColors);
+
+        var jumpableWormHoles = new Array();
+        
+        for (const w1 in wormholeSystems) {
+            // Loop through list and find pairs that are less that 8 ly apart
+            var srcSystem = wormholeSystems[w1];
+            for (const w2 in wormholeSystems) {
+                if( w1 == w2) {
+                    continue;
+                }
+                var destSystem = wormholeSystems[w2];
+                var d = CalculateSystemDistance(srcSystem,destSystem);
+                if( d < 8) {
+                    var jumpableHole = new Object();
+                    jumpableHole.src = srcSystem.scout_index;
+                    jumpableHole.dest = destSystem.scout_index;
+                    jumpableHole.distance = d;
+                    jumpableWormHoles.push(jumpableHole);
+                }
+            }
+        }
+        for (const w in jumpableWormHoles) {
+            var srcScout = gScoutData[jumpableWormHoles[w].src];
+            var dstScout = gScoutData[jumpableWormHoles[w].dest];
+
+            var route = new Array();
+            route.push(gSystemsList[srcScout.out_system_id].name);
+            route.push(gSystemsList[srcScout.in_system_id].name);
+            route.push("Jump " + jumpableWormHoles[w].distance.toFixed(1) + "ly");
+            route.push(gSystemsList[dstScout.in_system_id].name);
+            route.push(gSystemsList[dstScout.out_system_id].name);
+
+            console.log("Route: " + route);
+
+            var myLine = new Array();
+            myLine.push(Get3DPositionFromSystem(gSystemsList[srcScout.out_system_id]))
+            myLine.push(Get3DPositionFromSystem(gSystemsList[srcScout.in_system_id]))
+            myLines.push(myLine);
+
+            var myColorLine = new Array();
+            myColorLine.push(new BABYLON.Color4(0,1,1,0.5));
+            myColorLine.push(new BABYLON.Color4(0,1,1,0.5));
+            myColors.push(myColorLine);
+
+            myLine = new Array();
+            myLine.push(Get3DPositionFromSystem(gSystemsList[srcScout.in_system_id]))
+            myLine.push(Get3DPositionFromSystem(gSystemsList[dstScout.in_system_id]))
+            myLines.push(myLine);
+
+            myColorLine = new Array();
+            myColorLine.push(new BABYLON.Color4(0,1,0,1.0));
+            myColorLine.push(new BABYLON.Color4(0,1,0,1.0));
+            myColors.push(myColorLine);
+
+            myLine = new Array();
+            myLine.push(Get3DPositionFromSystem(gSystemsList[dstScout.in_system_id]))
+            myLine.push(Get3DPositionFromSystem(gSystemsList[dstScout.out_system_id]))
+            myLines.push(myLine);
+
+            myColorLine = new Array();
+            myColorLine.push(new BABYLON.Color4(0,1,0,1.0));
+            myColorLine.push(new BABYLON.Color4(0,1,0,1.0));
+            myColors.push(myColorLine);
+
+
+            create_gate_lines(myLines, myColors);
+
+            
+            var groupString = "Jumpable Route " + w;
+            AddScoutMenu("Jumps", groupString, groupString);
+
+            var srcText = gSystemsList[srcScout.out_system_id].name
+                + " (" + (gSystemsList[srcScout.out_system_id].position.x).toFixed(2)
+                + "," + (gSystemsList[srcScout.out_system_id].position.y).toFixed(2)
+                + "," + (gSystemsList[srcScout.out_system_id].position.z).toFixed(2)
+                + ")";
+            AddMenuItem(groupString, srcText);
+            var dstText = gSystemsList[srcScout.in_system_id].name
+                + " (" + (gSystemsList[srcScout.in_system_id].position.x).toFixed(2)
+                + "," + (gSystemsList[srcScout.in_system_id].position.y).toFixed(2)
+                + "," + (gSystemsList[srcScout.in_system_id].position.z).toFixed(2)
+                + ")";
+            AddMenuItem(groupString, dstText);
+
+            var dstText = gSystemsList[dstScout.in_system_id].name
+                + " (" + (gSystemsList[dstScout.in_system_id].position.x).toFixed(2)
+                + "," + (gSystemsList[dstScout.in_system_id].position.y).toFixed(2)
+                + "," + (gSystemsList[dstScout.in_system_id].position.z).toFixed(2)
+                + ")";
+            AddMenuItem(groupString, dstText);
+            
+            var srcText = gSystemsList[dstScout.out_system_id].name
+                + " (" + (gSystemsList[dstScout.out_system_id].position.x).toFixed(2)
+                + "," + (gSystemsList[dstScout.out_system_id].position.y).toFixed(2)
+                + "," + (gSystemsList[dstScout.out_system_id].position.z).toFixed(2)
+                + ")";
+            AddMenuItem(groupString, srcText);
+        }
+        
+
         
     }
 

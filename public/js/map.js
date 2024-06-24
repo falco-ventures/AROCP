@@ -43,7 +43,7 @@ function create_selection_sphere(name) {
     sphere.material = new BABYLON.StandardMaterial("SphereMaterial", Get3DScene());
     sphere.material.backFaceCulling = false;
     sphere.material.disableLighting = true;
-    sphere.material.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    sphere.material.emissiveColor = new BABYLON.Color3(0, 1.0, 0);
     
     var plane = BABYLON.MeshBuilder.CreatePlane("SelectionPlane", { width: 20, height: 10 }, Get3DScene());
     var planeMaterial = new BABYLON.StandardMaterial("SelectionMaterial", Get3DScene());
@@ -60,7 +60,7 @@ function create_selection_sphere(name) {
 
     planeMaterial.backFaceCulling = false;
     planeMaterial.disableLighting = true;
-    planeMaterial.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    planeMaterial.emissiveColor = new BABYLON.Color3(0, 1, 0);
     planeMaterial.diffuseTexture = planeTexture;
     planeMaterial.opacityTexture = planeTexture;
 
@@ -121,7 +121,7 @@ function create_hover_sphere(name) {
     sphere.material = new BABYLON.StandardMaterial("SphereMaterial2", Get3DScene());
     sphere.material.backFaceCulling = false;
     sphere.material.disableLighting = true;
-    sphere.material.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    sphere.material.emissiveColor = new BABYLON.Color3(1.0, 0, 0);
 
 
     var plane = BABYLON.MeshBuilder.CreatePlane("HoverPlane", { width: 20, height: 10 }, Get3DScene());
@@ -139,7 +139,7 @@ function create_hover_sphere(name) {
 
     planeMaterial.backFaceCulling = false;
     planeMaterial.disableLighting = true;
-    planeMaterial.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    planeMaterial.emissiveColor = new BABYLON.Color3(1.0, 0, 0);
     planeMaterial.diffuseTexture = planeTexture;
     planeMaterial.opacityTexture = planeTexture;
 
@@ -174,11 +174,11 @@ function create_region_sphere(region) {
     ctx.font = "bold 44px Arial";
     const textWidth = ctx.measureText(label).width;
     var x = (512 - textWidth)/2;
-    planeTexture.drawText(label, x, 256, "bold 44px Arial", "white", "transparent", true, true);
+    planeTexture.drawText(label, x, 256, "bold 32px Arial", "white", "transparent", true, true);
 
     planeMaterial.backFaceCulling = false;
     planeMaterial.disableLighting = true;
-    planeMaterial.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    planeMaterial.emissiveColor = new BABYLON.Color3(0.5,0.5,0.5,0.5);
     planeMaterial.diffuseTexture = planeTexture;
     planeMaterial.opacityTexture = planeTexture;
 
@@ -189,7 +189,7 @@ function create_region_sphere(region) {
     sphere.position = Get3DPositionFromRegion(region);
 
     plane.position.x = sphere.position.x;
-    plane.position.y = sphere.position.y + 5.25;
+    plane.position.y = sphere.position.y + 10;
     plane.position.z = sphere.position.z;
 }
 
