@@ -223,26 +223,26 @@ function verification_callback(data, code) {
 
                 gCharacterInfo.push(characterInfo)
 
-                if (window.location.href.includes("localhost")) {
-                    var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
-                    var paramString = "datasource=tranquility";
-                    var command_type = "GET";
-                    var headers = {};
-                    headers["Content-Type"] = "application/json";
-                    headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+                // if (window.location.href.includes("localhost")) {
+                //     var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
+                //     var paramString = "datasource=tranquility";
+                //     var command_type = "GET";
+                //     var headers = {};
+                //     headers["Content-Type"] = "application/json";
+                //     headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
-                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
-                } else {
-                    var base = "https://instacardapp.com/AROCP/public/php/location.php";
-                    var paramString = "code=" +  gCharacterCodes[0] + "&character=" + characterInfo.CharacterID;
-                    var command_type = "GET";
-                    var headers = {};
-                    headers["Content-Type"] = "application/json";
-                    headers["Authorization"] = "Bearer " +  gCharacterCodes[0];
+                //     sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+                // } else {
+                //     var base = "https://instacardapp.com/AROCP/public/php/location.php";
+                //     var paramString = "code=" +  gCharacterCodes[0] + "&character=" + characterInfo.CharacterID;
+                //     var command_type = "GET";
+                //     var headers = {};
+                //     headers["Content-Type"] = "application/json";
+                //     headers["Authorization"] = "Bearer " +  gCharacterCodes[0];
 
-                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null,  loginCredentials);
+                //     sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null,  loginCredentials);
 
-                }
+                // }
 
                 var base = "https://instacardapp.com/AROCP/public/php/character.php";
                 // var base = "https://esi.evetech.net/latest/characters/2122278309/?datasource=tranquility";
