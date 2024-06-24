@@ -624,6 +624,57 @@ function InitializeUniverse(systems_json) {
 
 }
 
+var gScoutData = new Array();
+var gScoutLines = null;
+
+function ProcessScouts(response) {
+    
+    gScoutData = JSON.parse(response.responseText);
+    if (gScoutData != null) {
+        var myLines = new Array();
+        var myColors = new Array();
+
+        for (const scout_entry in gScoutData) {
+            var scout_data = gScoutData[scout_entry];
+            // var itemText = gate.name;
+            var srcSystem = gSystemsList[scout_data.in_system_id];
+            var destSystem = gSystemsList[scout_data.out_system_id];
+            // console.log( "Gate: " + gate.name + 
+            //                 " from " + srcSystem.name +
+            //                 " to " + destSystem.name
+            //                 )
+            //Array of lines to construct linesystem
+            var myLine = new Array();
+            myLine.push(Get3DPositionFromSystem(srcSystem))
+            myLine.push(Get3DPositionFromSystem(destSystem))
+            myLines.push(myLine);
+
+            // [   new BABYLON.Color4(0, 1, 1, 1),
+            var myColorLine = new Array();
+            myColorLine.push(new BABYLON.Color4(0.25,0.25,0.25,0.5));
+            myColorLine.push(new BABYLON.Color4(0.25,0.25,0.25,0.5));
+            myColors.push(myColorLine);
+
+        }
+        if(gScoutLines != null) {
+            gScoutLines.dispose();
+        }
+        gScoutLines = create_gate_lines(myLines, myColors);
+
+    }
+
+}
+
+function InitializeEveScout() {
+    sendCommand("https://api.eve-scout.com/v2/public/signatures", "", ProcessScouts);
+
+    const myFunction = () => {
+        sendCommand("https://api.eve-scout.com/v2/public/signatures", "", ProcessScouts);
+    }
+    };
+    
+    setInterval(myFunction, 10000); // Repeat myFunction every 2 seconds
+
 function InitializeGates() {
     var myLines = new Array();
     var myColors = new Array();
@@ -651,7 +702,7 @@ function InitializeGates() {
 
     }
     create_gate_lines(myLines, myColors);
-    
+    InitializeEveScout();
 }
 
 
