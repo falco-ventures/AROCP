@@ -234,13 +234,13 @@ function verification_callback(data, code) {
                     sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
                 } else {
                     var base = "https://instacardapp.com/AROCP/public/php/location.php";
-                    var paramString = "code=" +  gCharacterCodes[0] + "&character=" + characterInfo.CharacterID;
+                    var paramString = "code=" +  characterInfo.access_token + "&character=" + characterInfo.CharacterID;
                     var command_type = "GET";
                     var headers = {};
                     headers["Content-Type"] = "application/json";
-                    headers["Authorization"] = "Bearer " +  gCharacterCodes[0];
+                    headers["Authorization"] = "Bearer " + characterInfo.access_token;
 
-                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null,  loginCredentials);
+                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null,  characterInfo);
 
                 }
 
