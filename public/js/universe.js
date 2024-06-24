@@ -805,22 +805,28 @@ function ProcessScouts(response) {
                 + " - " + (scoutData.in_signature)
                 + ")";
             var system = gSystemsList[system_id];
+            var destString = system.name + wormholeSig + " Time: " + scoutData.remaining_hours;
+
             if (system.security_status >= 0.5) {
-                var destString = system.name + wormholeSig + " Sec: " + system.security_status.toFixed(1) + ")";
-                AddMenuItem("Thera", destString);
-                var myLine = new Array();
-                myLine.push(Get3DPositionFromSystem(thera))
-                myLine.push(Get3DPositionFromSystem(system))
-                myLines.push(myLine);
-
-                var myColorLine = new Array();
-                myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
-                myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
-                myColors.push(myColorLine);
-
-                create_gate_lines(myLines, myColors);
-
+                AddMenuItem("Thera1", destString);
+            } else if (system.security_status >= 0.0) {
+                AddMenuItem("Thera2", destString);
+            } else {
+                AddMenuItem("Thera3", destString);
             }
+
+            var myLine = new Array();
+            myLine.push(Get3DPositionFromSystem(thera))
+            myLine.push(Get3DPositionFromSystem(system))
+            myLines.push(myLine);
+
+            var myColorLine = new Array();
+            myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
+            myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
+            myColors.push(myColorLine);
+
+
+            
         }
         gScoutLines = create_gate_lines(myLines, myColors);
 
