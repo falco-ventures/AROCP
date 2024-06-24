@@ -778,29 +778,21 @@ function ProcessScouts(response) {
             AddScoutMenu("Jumps", groupString, groupString);
 
             var srcText = gSystemsList[srcScout.out_system_id].name
-                + " (" + (gSystemsList[srcScout.out_system_id].position.x).toFixed(2)
-                + "," + (gSystemsList[srcScout.out_system_id].position.y).toFixed(2)
-                + "," + (gSystemsList[srcScout.out_system_id].position.z).toFixed(2)
+                + " (" + (srcScout.out_signature)
                 + ")";
             AddMenuItem(groupString, srcText);
             var dstText = gSystemsList[srcScout.in_system_id].name
-                + " (" + (gSystemsList[srcScout.in_system_id].position.x).toFixed(2)
-                + "," + (gSystemsList[srcScout.in_system_id].position.y).toFixed(2)
-                + "," + (gSystemsList[srcScout.in_system_id].position.z).toFixed(2)
+                + " (" + (srcScout.in_signature)
                 + ")";
             AddMenuItem(groupString, dstText);
 
             var dstText = gSystemsList[dstScout.in_system_id].name
-                + " (" + (gSystemsList[dstScout.in_system_id].position.x).toFixed(2)
-                + "," + (gSystemsList[dstScout.in_system_id].position.y).toFixed(2)
-                + "," + (gSystemsList[dstScout.in_system_id].position.z).toFixed(2)
+                + " (" + (dstScout.in_signature)
                 + ")";
             AddMenuItem(groupString, dstText);
 
             var srcText = gSystemsList[dstScout.out_system_id].name
-                + " (" + (gSystemsList[dstScout.out_system_id].position.x).toFixed(2)
-                + "," + (gSystemsList[dstScout.out_system_id].position.y).toFixed(2)
-                + "," + (gSystemsList[dstScout.out_system_id].position.z).toFixed(2)
+                + " (" + (dstScout.out_signature)
                 + ")";
             AddMenuItem(groupString, srcText);
         }
@@ -820,6 +812,9 @@ function ProcessScouts(response) {
                 myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
                 myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
                 myColors.push(myColorLine);
+
+                create_gate_lines(myLines, myColors);
+
             }
         }
         gScoutLines = create_gate_lines(myLines, myColors);
