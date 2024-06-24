@@ -369,6 +369,38 @@ function click_system_callback() {
     var systemName = this.innerHTML.split(' (')[0];
     select_system(systemName);
 }
+
+
+function ColorFromSecurity(security) {
+    var black = [0, 0, 0];
+    var blue = [0, 0, 1];
+    var cyan = [0, 1, 1];
+    var green = [0, 1, 0];
+    var yellow = [1, 1, 0];
+    var red = [1, 0.6, 0.6];
+    var orange = [1, 0.6, 0];
+    var darkRed = [0.7, 0.1, 0.1];
+    var color = black;
+    if (security <= 0.0) {
+        color = darkRed;
+    } else if (security <= 0.2) {
+        color = red;
+    } else if (security <= 0.3) {
+        color = orange;
+    } else if (security <= 0.4) {
+        color = orange;
+    } else if (security <= 0.5) {
+        color = yellow;
+    } else if (security <= 0.6) {
+        color = cyan;
+    } else if (security <= 0.7) {
+        color = green;
+    } else {
+        color = blue;
+    }
+    return new BABYLON.Color3(color[0], color[1], color[2]);
+}
+
 function InitializeUniverse(systems_json) {
 
 
@@ -469,32 +501,7 @@ function InitializeUniverse(systems_json) {
 
         //Color
         let security = systems_json[system].security_status;
-        var black = [0, 0, 0];
-        var blue = [0, 0, 1];
-        var cyan = [0, 1, 1];
-        var green = [0, 1, 0];
-        var yellow = [1, 1, 0];
-        var red = [1, 0.6, 0.6];
-        var darkRed = [1, 0.2, 0.2];
-        var color = black;
-        if (security <= 0.1) {
-            color = darkRed;
-        } else if (security <= 0.2) {
-            color = darkRed;
-        } else if (security <= 0.3) {
-            color = red;
-        } else if (red <= 0.4) {
-            color = red;
-        } else if (security <= 0.5) {
-            color = yellow;
-        } else if (security <= 0.6) {
-            color = cyan;
-        } else if (security <= 0.7) {
-            color = green;
-        } else {
-            color = blue;
-        }
-        systems_json[system].color = new BABYLON.Color3(color[0], color[1], color[2]);
+        systems_json[system].color = ColorFromSecurity(security);
 
         gSystemsList[systems_json[system].system_id] = systems_json[system];
         //Add to system map
@@ -746,8 +753,8 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             var myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
-            myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 0.5));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 0.5));
             myColors.push(myColorLine);
 
             myLine = new Array();
@@ -769,9 +776,6 @@ function ProcessScouts(response) {
             myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
             myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
             myColors.push(myColorLine);
-
-
-            create_gate_lines(myLines, myColors);
 
 
             var groupString = "Jumpable Route " + w;
@@ -820,9 +824,10 @@ function ProcessScouts(response) {
             myLine.push(Get3DPositionFromSystem(system))
             myLines.push(myLine);
 
+            var lineColor=ColorFromSecurity(system.security_status);
             var myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
-            myColorLine.push(new BABYLON.Color4(0, 1, 1, 0.5));
+            myColorLine.push(lineColor);
+            myColorLine.push(lineColor);
             myColors.push(myColorLine);
 
 
