@@ -76,7 +76,7 @@ $character = $_GET['character'];
 $get_result = CurlSendGetRequest("https://esi.evetech.net/latest/characters/$character/location/?datasource=tranquility", $bearer);    
 
 header('Access-Control-Allow-Origin: *');
-// header('Content-Type: application/json');
+header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: GET, POST');
 header("Access-Control-Allow-Headers: X-Requested-With");
 
