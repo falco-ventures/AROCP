@@ -223,14 +223,14 @@ function verification_callback(data, code) {
 
                 gCharacterInfo.push(characterInfo)
 
-                var base = "https://instacardapp.com/AROCP/public/php/location.php";
-                var paramString = "code=" + loginCredentials.access_token + "&character="+characterInfo.CharacterID;
-                var command_type = "GET";
-                var headers = {};
-                headers["Content-Type"] = "application/json";
-                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+                // var base = "https://instacardapp.com/AROCP/public/php/location.php";
+                // var paramString = "code=" + loginCredentials.access_token + "&character="+characterInfo.CharacterID;
+                // var command_type = "GET";
+                // var headers = {};
+                // headers["Content-Type"] = "application/json";
+                // headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
-                sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+                // sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
 
                 var base = "https://instacardapp.com/AROCP/public/php/character.php";
                 // var base = "https://esi.evetech.net/latest/characters/2122278309/?datasource=tranquility";
@@ -241,14 +241,14 @@ function verification_callback(data, code) {
                 headers["Authorization"] = "Bearer " + code;
                 sendCommand(base, paramString, ValidateCorp, command_type, headers, null, code);
 
-                // var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
-                // var paramString = "datasource=tranquility";
-                // var command_type = "GET";
-                // var headers = {};
-                // headers["Content-Type"] = "application/json";
-                // headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+                var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
+                var paramString = "datasource=tranquility";
+                var command_type = "GET";
+                var headers = {};
+                headers["Content-Type"] = "application/json";
+                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
-                // sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+                sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
 
             }
         } catch (e) {
