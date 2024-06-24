@@ -341,8 +341,8 @@ function main() {
     //Make sure the Character ID list is up to date
     // check_cookie();
     parse_my_url();
-
-    InitializeEveScout();
+    
+    download_character_info();
 
     LoadSystemsJSON();
 }
