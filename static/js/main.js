@@ -92,7 +92,7 @@ function sendCommand(commandName, paramString, callback, command_type, headers, 
         req.send();
 }
 var gCharacterInfo = new Array();
-var loginCredentials;
+var loginCredentials = new Object();
 
 function ValidateCorp(data) {
     if (data != undefined) {
@@ -193,7 +193,7 @@ function ProcessCharacterLocation(data) {
 
     }
 }
-function verification_callback(data, access_token) {
+function verification_callback(data, code) {
     if (data != undefined) {
 
         // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
@@ -211,6 +211,8 @@ function verification_callback(data, access_token) {
         try {
             var characterInfo = JSON.parse(data.responseText);
             if (characterInfo != undefined && characterInfo.CharacterName != undefined) {
+                // loginCredentials.code = characterInfo.code;
+                
                 // characterInfo.refresh_token = loginCredentials.refresh_token;
                 // alert("Welcome " + characterInfo.CharacterName + " ID: " + characterInfo.CharacterID);
                 console.log(JSON.stringify(characterInfo));
@@ -220,20 +222,21 @@ function verification_callback(data, access_token) {
                 gCharacterInfo.push(characterInfo)
 
                 var base = "https://instacardapp.com/AROCP/public/php/location.php";
-                var paramString = "code=" + access_token + "&character="+characterInfo.CharacterID;
+                var paramString = "code=" + code + "&character="+characterInfo.CharacterID;
                 var command_type = "GET";
                 var headers = {};
-                headers["Content-Type"] = "application/json";
-                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+                // headers["Content-Type"] = "application/json";
+                // headers["Authorization"] = "Bearer " + code;
 
-                sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+                sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, code);
 
                 var base = "https://instacardapp.com/AROCP/public/php/character.php";
-                var paramString = "code=" + loginCredentials.access_token + "&character="+characterInfo.CharacterID;
+                var paramString = "code=" + code + "&character="+characterInfo.CharacterID;
                 var command_type = "GET";
                 var headers = {};
-                headers["Content-Type"] = "application/json";
-                var callback_data = loginCredentials;
+                // headers["Content-Type"] = "application/json";
+                // headers["Authorization"] = "Bearer " + code;
+                var callback_data = code;
                 sendCommand(base, paramString, ValidateCorp, command_type, headers, null, callback_data);
             }
         } catch (e) {
@@ -255,8 +258,8 @@ function authorization_callback(data, callback_data) {
             var headers = {};
             headers["Content-Type"] = "application/json";
             headers["Authorization"] = "Bearer " + loginCredentials.access_token;
-            loginCredentials.code = callback_data;
-            sendCommand(base, paramString, verification_callback, command_type, headers, null, loginCredentials);
+            // loginCredentials.code = callback_data;
+            sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
         } catch (e) {
 
         }
@@ -291,7 +294,7 @@ function authorize_character_code(code) {
     var command_type = "GET";
     var headers = {};
     headers["Content-Type"] = "application/json";
-    var callback_data = code;
+    var callback_data = loginCredentials.access_token;
     sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
 }
 
