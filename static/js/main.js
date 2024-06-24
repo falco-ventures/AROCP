@@ -103,7 +103,7 @@ function ValidateCorp(data) {
             var character = gCharacterInfo[0];
             character.characterInfo = characterInfo;
             // alert(character.characterInfo.cororation_id)
-            if(characterInfo.corporation_id == 98770774) {
+            if (characterInfo.corporation_id == 98770774) {
                 document.getElementById("logo").style.width = '0';
             }
         } catch (e) {
@@ -120,9 +120,9 @@ function ProcessCharacterRoute(data) {
         try {
             var character = gCharacterInfo[0];
             var characterRouteInfo = JSON.parse(data.responseText);
-            var system = gSystemsList[characterRouteInfo[characterRouteInfo.length-1]];
+            var system = gSystemsList[characterRouteInfo[characterRouteInfo.length - 1]];
 
-            var scoutData = theraConnectedSystems[characterRouteInfo[characterRouteInfo.length-1]];
+            var scoutData = theraConnectedSystems[characterRouteInfo[characterRouteInfo.length - 1]];
 
             var wormholeSig = "( " + system.security_status.toFixed(1) + " " + (scoutData.out_signature)
                 + " - " + (scoutData.in_signature)
@@ -133,7 +133,7 @@ function ProcessCharacterRoute(data) {
 
             AddMenuItem("Characters", destString);
 
-            
+
 
         } catch (e) {
 
@@ -186,7 +186,7 @@ function ProcessCharacterLocation(data) {
             // sendCommand(base, paramString, ValidateCorp, command_type, headers, null, loginCredentials);
 
 
-            
+
         } catch (e) {
 
         }
@@ -212,7 +212,7 @@ function verification_callback(data, code) {
             var characterInfo = JSON.parse(data.responseText);
             if (characterInfo != undefined && characterInfo.CharacterName != undefined) {
                 // loginCredentials.code = characterInfo.code;
-                
+
                 // characterInfo.refresh_token = loginCredentials.refresh_token;
                 // alert("Welcome " + characterInfo.CharacterName + " ID: " + characterInfo.CharacterID);
                 console.log(JSON.stringify(characterInfo));
@@ -223,32 +223,36 @@ function verification_callback(data, code) {
 
                 gCharacterInfo.push(characterInfo)
 
-                // var base = "https://instacardapp.com/AROCP/public/php/location.php";
-                // var paramString = "code=" + loginCredentials.access_token + "&character="+characterInfo.CharacterID;
-                // var command_type = "GET";
-                // var headers = {};
-                // headers["Content-Type"] = "application/json";
-                // headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+                if (window.location.href.includes("localhost")) {
+                    var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
+                    var paramString = "datasource=tranquility";
+                    var command_type = "GET";
+                    var headers = {};
+                    headers["Content-Type"] = "application/json";
+                    headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
-                // sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+                } else {
+                    var base = "https://instacardapp.com/AROCP/public/php/location.php";
+                    var paramString = "code=" + code + "&character=" + characterInfo.CharacterID;
+                    var command_type = "GET";
+                    var headers = {};
+                    headers["Content-Type"] = "application/json";
+                    headers["Authorization"] = "Bearer " + code;
+
+                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, code);
+
+                }
 
                 var base = "https://instacardapp.com/AROCP/public/php/character.php";
                 // var base = "https://esi.evetech.net/latest/characters/2122278309/?datasource=tranquility";
-                var paramString = "code=" + code + "&character="+characterInfo.CharacterID;
+                var paramString = "code=" + code + "&character=" + characterInfo.CharacterID;
                 var command_type = "GET";
                 var headers = {};
                 headers["Content-Type"] = "application/json";
                 headers["Authorization"] = "Bearer " + code;
                 sendCommand(base, paramString, ValidateCorp, command_type, headers, null, code);
 
-                var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
-                var paramString = "datasource=tranquility";
-                var command_type = "GET";
-                var headers = {};
-                headers["Content-Type"] = "application/json";
-                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
-
-                sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
 
             }
         } catch (e) {
@@ -306,7 +310,7 @@ function authorize_character_code(code) {
     var command_type = "GET";
     var headers = {};
     headers["Content-Type"] = "application/json";
-    var callback_data = loginCredentials.access_token;
+    var callback_data = code;
     sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
 }
 
