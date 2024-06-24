@@ -342,7 +342,6 @@ function main() {
     // check_cookie();
     parse_my_url();
     
-    download_character_info();
 
     LoadSystemsJSON();
 }

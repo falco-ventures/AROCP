@@ -838,6 +838,7 @@ function ProcessScouts(response) {
 
     }
 
+    download_character_info();
 }
 
 function InitializeEveScout() {
