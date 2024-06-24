@@ -39,7 +39,7 @@
 
         #renderCanvas {
             width: 100%;
-            height: 80%;
+            height: 100%;
             touch-action: none;
             /* background-color: rgb(126, 126, 126);
             color: rgb(126, 126, 126); */
@@ -129,7 +129,9 @@
 </head>
 
 <body>
-    <div class="images" style="width: 500px; height: 100%; float: left; background: rgb(0, 0, 0); overflow-y: scroll;">
+
+    <a id="downloadAnchorElem" href="javascript:click_download()"></a>
+    <div class="images" style="width: 300px; height: 100%; float: left; background: rgb(0, 0, 0); overflow-y: scroll;">
 
         <ul id="myUL">
             <li><span class="box">Universe</span>
@@ -175,7 +177,7 @@
                 </ul>
             </li>
     </div>
-    <div style="margin-left: 500px; height: 100%; background-color:black; ">
+    <div style="margin-left: 300px; height: 100%; background-color:black; ">
         <canvas id="renderCanvas"></canvas>
     </div>
     <!-- <div class="images">

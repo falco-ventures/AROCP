@@ -153,7 +153,25 @@ function create_region_sphere(region) {
     plane.position.y = sphere.position.y + 5.25;
     plane.position.z = sphere.position.z;
 }
+function create_gate_lines(myLines, myColors) {
 
+
+	//Create linesystem
+	const linesystem = BABYLON.MeshBuilder.CreateLineSystem("linesystem", {lines: myLines, colors:myColors}); 
+	
+
+// const options = {
+    //     points: myPoints, //vec3 array,
+    //     updatable: true,
+    //   };
+
+    //   let lines = BABYLON.MeshBuilder.CreateLines("lines", options, scene); //scene is optional and defaults to the current scene
+
+    //   // Update
+    //   options.points[0].x += 6;
+    //   options.instance = lines;
+    //   lines = BABYLON.MeshBuilder.CreateLines("lines", options); //No scene parameter when using instance
+}
 
 function vecToLocal(vector, mesh) {
     var m = mesh.getWorldMatrix();

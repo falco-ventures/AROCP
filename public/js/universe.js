@@ -3,6 +3,9 @@ var gSystemMap = new Object();
 var gConstellations = new Object();
 var gRegions = new Object();
 
+var gGateIDs = new Array();
+var gGates = new Object();
+
 var g3DScene;
 var gSelectedGalaxy = "";
 
@@ -13,10 +16,11 @@ var gScale = 1.0;
 // 1 AU = 149,597,870,700 meters
 var metersPerAu = 9460000000000000;
 
-var gSystemList = new Array();
+var gSystemsList = new Object();
 var gUniverseScale = 1.0;
 var gCurrentSystemIO = 0;
 var gCurrentRegionIO = 0;
+var gCurrentGateIO = 0;
 var gCurrentConstellationIO = 0;
 
 var gSelectionName = "Jita";
@@ -136,6 +140,7 @@ function ProcessRegion(cData_i) {
             download_json("regions.json", gRegions);
         }
 
+
     }
 
 }
@@ -157,6 +162,43 @@ function GetNextRegion(data_i) {
     gCurrentRegionIO++;
     setTimeout(() => { sendCommand(url, "datasource=tranquility&language=en", ProcessRegion); }, 10);
 }
+
+
+function ProcessGate(cData_i) {
+    try {
+        var gateData = JSON.parse(cData_i.responseText);
+        gGates[gateData.stargate_id] = gateData;
+        if (gCurrentGateIO < gGateIDs.length) {
+            GetNextGate();
+        } else {
+            download_json("gates.json", gGates);
+            InitializeGates();
+        }
+
+    } catch {
+        download_json("gates.json", gGates);
+        InitializeGates();
+    }
+}
+
+function GetNextGate(data_i) {
+    var gateIDs = gGateIDs;
+
+    if (gGates[gateIDs[0]] == undefined) {
+        // var data = JSON.parse(data_i.responseText);
+        for (var i = 0; i < gGateIDs.length; i++) {
+            gGates[(gGateIDs[i])] = new Object();
+            gGates[(gGateIDs[i])].stargate_id = (gGateIDs[i].stargate_id);
+        }
+    }
+
+    var url = "https://esi.evetech.net/latest/universe/stargates/" + gateIDs[gCurrentGateIO] + "/";
+    if (gCurrentGateIO % 10 == 0) {
+        console.log("Getting " + gCurrentGateIO + " of " + gateIDs.length);
+    }
+    gCurrentGateIO++;
+    setTimeout(() => { sendCommand(url, "datasource=tranquility&language=en", ProcessGate); }, 10);
+}
 function LoadSystemsJSON() {
     //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
     loadExternalFile("constellations.json", function (text) {
@@ -171,7 +213,7 @@ function LoadSystemsJSON() {
             try {
                 gRegions = JSON.parse(text);
             } catch {
-                gConstellations = new Object();
+                gRegions = new Object();
                 sendCommand("https://esi.evetech.net/latest/universe/regions/", "datasource=tranquility", GetNextRegion);
             }
 
@@ -181,10 +223,12 @@ function LoadSystemsJSON() {
                     gSystems = JSON.parse(text);
                     startApplication(gSystems);
                 } catch {
-                    //https://esi.evetech.net/latest/universe/systems/?datasource=tranquility
+                    gSystems = new Object();
                     sendCommand("https://esi.evetech.net/latest/universe/systems/", "datasource=tranquility", GetNextSystem);
                 }
+
             })
+
         })
     })
 
@@ -321,6 +365,8 @@ function click_system_callback() {
 }
 function InitializeUniverse(systems_json) {
 
+
+
     gUniverse.NewEden = new Object();
     gUniverse.NewEden.name = "New Eden";
     gUniverse.NewEden.systems = new Object();
@@ -359,19 +405,19 @@ function InitializeUniverse(systems_json) {
     keys.sort();
     for (var i = 0; i < keys.length; ++i) {
         var region = gRegions[keys[i]];
-        if(region.region_id < 11000000) {
+        if (region.region_id < 11000000) {
             //new eden
             region.space = "NewEden";
             gUniverse.NewEden[region.name] = region;
-        } else if(region.region_id < 11000031) {
+        } else if (region.region_id < 11000031) {
             //wormhole
             region.space = "WormholeSpace";
             gUniverse.WormholeSpace[region.name] = region;
-        } else if(region.region_id < 12000000) {
+        } else if (region.region_id < 12000000) {
             //shattered wormhole
             region.space = "ShatteredWormholeSpace";
             gUniverse.ShatteredWormholeSpace[region.name] = region;
-        }else if(region.region_id < 14000000) {
+        } else if (region.region_id < 14000000) {
             //AD
             region.space = "ADSpace";
             gUniverse.ADSpace[region.name] = region;
@@ -396,7 +442,7 @@ function InitializeUniverse(systems_json) {
         var region = gRegions[constellation.region_id];
         var space = region.space;
         gUniverse[space][region.name][keys[i]] = constellation;
-        
+
     }
 
 
@@ -404,8 +450,10 @@ function InitializeUniverse(systems_json) {
     keys.sort();
     for (var i = 0; i < keys.length; ++i) {
 
+
         var system = keys[i];
         var systemName = systems_json[system].name;
+
 
         //Convert units
         systems_json[system].position.x = systems_json[system].position.x / metersPerAu;
@@ -442,10 +490,25 @@ function InitializeUniverse(systems_json) {
         }
         systems_json[system].color = new BABYLON.Color3(color[0], color[1], color[2]);
 
+        gSystemsList[systems_json[system].system_id] = systems_json[system];
         //Add to system map
         gSystemMap[systemName] = systems_json[system];
+        if (systems_json[system].stargates != undefined) {
+            for (stargate_id in systems_json[system].stargates) {
+                gGateIDs.push(systems_json[system].stargates[stargate_id]);
+            }
+        }
     }
-
+    //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
+    loadExternalFile("gates.json", function (text) {
+        try {
+            gGates = JSON.parse(text);
+            InitializeGates()
+        } catch {
+            gGates = new Object();
+            GetNextGate();
+        }
+    });
     //Universe bounds
     for (const system_name in systems_json) {
         var position = systems_json[system_name].position;
@@ -502,7 +565,7 @@ function InitializeUniverse(systems_json) {
 
         }
         else if (system.system_id > 31000000 && system.system_id < 32000000) {
-            var constellation= gConstellations[system.constellation_id];
+            var constellation = gConstellations[system.constellation_id];
             var region = gRegions[constellation.region_id];
             systemType = region.space;
             if (systemType == "ShatteredWormholeSpace") {
@@ -530,25 +593,25 @@ function InitializeUniverse(systems_json) {
     }
 
     // gUniverse.NewEden.bbox = gUniverse.NewEden.nullsec.bbox;
-
+    //Calculate region positions
     for (const space_name in gUniverse) {
         gUniverse[space_name].bbox.center = new Object();
         gUniverse[space_name].bbox.center.x = (gUniverse[space_name].bbox.min.x + gUniverse[space_name].bbox.max.x) / 2;
         gUniverse[space_name].bbox.center.y = (gUniverse[space_name].bbox.min.y + gUniverse[space_name].bbox.max.y) / 2;
         gUniverse[space_name].bbox.center.z = (gUniverse[space_name].bbox.min.z + gUniverse[space_name].bbox.max.z) / 2;
-        
+
         for (const region_name in gRegions) {
             var region = gRegions[region_name];
-            if(region.space == space_name) {
-                gUniverse[space_name][region.name].position = new BABYLON.Vector3(0,0,0);
-                var numConst=0;
+            if (region.space == space_name) {
+                gUniverse[space_name][region.name].position = new BABYLON.Vector3(0, 0, 0);
+                var numConst = 0;
                 for (const constellation_name in gConstellations) {
                     var constellation = gConstellations[constellation_name];
-                    if(constellation.region_id == region.region_id) {
-                    gUniverse[space_name][region.name].position.x += constellation.position.x;
-                    gUniverse[space_name][region.name].position.y += constellation.position.y;
-                    gUniverse[space_name][region.name].position.z += constellation.position.z;
-                    numConst++;
+                    if (constellation.region_id == region.region_id) {
+                        gUniverse[space_name][region.name].position.x += constellation.position.x;
+                        gUniverse[space_name][region.name].position.y += constellation.position.y;
+                        gUniverse[space_name][region.name].position.z += constellation.position.z;
+                        numConst++;
                     }
                 }
                 gUniverse[space_name][region.name].position.x /= numConst;
@@ -561,6 +624,35 @@ function InitializeUniverse(systems_json) {
 
 }
 
+function InitializeGates() {
+    var myLines = new Array();
+    var myColors = new Array();
+
+    for (const gate_name in gGates) {
+        var gate = gGates[gate_name];
+        // var itemText = gate.name;
+        var srcSystem = gSystemsList[gate.system_id];
+        var destSystem = gSystemsList[gate.destination.system_id];
+        // console.log( "Gate: " + gate.name + 
+        //                 " from " + srcSystem.name +
+        //                 " to " + destSystem.name
+        //                 )
+        //Array of lines to construct linesystem
+        var myLine = new Array();
+        myLine.push(Get3DPositionFromSystem(srcSystem))
+        myLine.push(Get3DPositionFromSystem(destSystem))
+        myLines.push(myLine);
+
+        // [   new BABYLON.Color4(0, 1, 1, 1),
+        var myColorLine = new Array();
+        myColorLine.push(new BABYLON.Color4(0.25,0.25,0.25,0.25));
+        myColorLine.push(new BABYLON.Color4(0.25,0.25,0.25,0.25));
+        myColors.push(myColorLine);
+
+    }
+    create_gate_lines(myLines, myColors);
+    
+}
 
 
 function InitializeMenus() {
@@ -593,24 +685,6 @@ function InitializeMenus() {
         var constellation = gConstellations[system.constellation_id];
         AddMenuItem(constellation.name, itemText);
     }
-
-    // for (const space_name in gUniverse) {
-    //     var menuItem = document.getElementById(space_name + "UL");
-
-
-    //     var itemText = gUniverse[space_name].name
-    //         + " (" + (gUniverse[space_name].bbox.min.x).toFixed(2)
-    //         + "," + (gUniverse[space_name].bbox.min.y).toFixed(2)
-    //         + "," + (gUniverse[space_name].bbox.min.z).toFixed(2)
-    //         + ") - "
-    //         + " (" + (gUniverse[space_name].bbox.max.x).toFixed(2)
-    //         + "," + (gUniverse[space_name].bbox.max.y).toFixed(2)
-    //         + "," + (gUniverse[space_name].bbox.max.z).toFixed(2)
-    //         + ")";
-
-    //     menuItem.innerHTML = itemText;
-    // }
-
     /*
     list clicking
     */
@@ -641,12 +715,12 @@ function AddMenuItem(parentMenuID, itemText) {
 
 function AddRegionMenu(parentMenuID, region_name, itemText) {
     var ul = document.getElementById(parentMenuID);
-   
+
     var li = document.createElement("li");
     var span = document.createElement("span");
 
     span.class = "box";
-    span.id = region_name+"UL";
+    span.id = region_name + "UL";
     span.innerHTML = itemText;
     li.appendChild(span);
 
@@ -654,7 +728,7 @@ function AddRegionMenu(parentMenuID, region_name, itemText) {
     newul.class = "nested";
     newul.id = region_name;
     li.appendChild(newul);
-    
+
     li.addEventListener("click", function () {
         this.parentElement.querySelector("nested").classList.toggle("active");
         this.classList.toggle("check-box");
@@ -668,12 +742,12 @@ function AddRegionMenu(parentMenuID, region_name, itemText) {
 
 function AddConstellationMenu(parentMenuID, c_name, itemText) {
     var ul = document.getElementById(parentMenuID);
-   
+
     var li = document.createElement("li");
     var span = document.createElement("span");
 
     span.class = "box";
-    span.id = c_name+"UL";
+    span.id = c_name + "UL";
     span.innerHTML = itemText;
     li.appendChild(span);
 
@@ -681,7 +755,7 @@ function AddConstellationMenu(parentMenuID, c_name, itemText) {
     newul.class = "nested";
     newul.id = c_name;
     li.appendChild(newul);
-    
+
     li.addEventListener("click", function () {
         this.parentElement.querySelector("nested").classList.toggle("active");
         this.classList.toggle("check-box");
