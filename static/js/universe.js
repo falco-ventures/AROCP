@@ -783,12 +783,12 @@ function ProcessScouts(response) {
                 + ")";
             AddMenuItem(groupString, srcText);
             var dstText = gSystemsList[srcScout.in_system_id].name
-                + " (" + ("Jump")
+                + " ( Time Remaining: " + srcScout.remaining_hours
                 + ")";
             AddMenuItem(groupString, dstText);
 
             var dstText = gSystemsList[dstScout.in_system_id].name
-                + " (" + ("Jump")
+            + " ( Time Remaining: " + dstScout.remaining_hours
                 + ")";
             AddMenuItem(groupString, dstText);
 
