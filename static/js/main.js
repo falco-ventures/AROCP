@@ -99,7 +99,7 @@ function ValidateCorp(data) {
         console.log("Requested Character Info and got " + data.responseText);
 
         try {
-            var characterInfo = JSON.parse(data.responseText);
+            var characterInfo = JSON..parse(JSON.parse(data.responseText));
             var character = gCharacterInfo[0];
             character.characterInfo = characterInfo;
             // alert(character.characterInfo.cororation_id)
@@ -229,11 +229,11 @@ function verification_callback(data, loginCredentials) {
                 sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
 
                 var base = "https://instacardapp.com/AROCP/public/php/character.php";
-                var paramString = "code=" + code + "&character";
+                var paramString = "code=" + loginCredentials.access_token + "&character="+characterInfo.CharacterID;
                 var command_type = "GET";
                 var headers = {};
                 headers["Content-Type"] = "application/json";
-                var callback_data = code;
+                var callback_data = loginCredentials;
                 sendCommand(base, paramString, ValidateCorp, command_type, headers, null, callback_data);
             }
         } catch (e) {
