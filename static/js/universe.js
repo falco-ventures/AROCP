@@ -379,7 +379,7 @@ function ColorFromSecurity(security) {
     var yellow = [1, 1, 0];
     var red = [1, 0.6, 0.6];
     var orange = [1, 0.6, 0];
-    var darkRed = [0.7, 0.1, 0.1];
+    var darkRed = [0.5, 0.1, 0.1];
     var color = black;
     if (security <= 0.0) {
         color = darkRed;
@@ -753,8 +753,8 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             var myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0, 1, 0, 0.5));
-            myColorLine.push(new BABYLON.Color4(0, 1, 0, 0.5));
+            myColorLine.push(ColorFromSecurity(gSystemsList[srcScout.out_system_id].security_status));
+            myColorLine.push(ColorFromSecurity(gSystemsList[srcScout.in_system_id].security_status));
             myColors.push(myColorLine);
 
             myLine = new Array();
@@ -763,8 +763,8 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
-            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
+            myColorLine.push(ColorFromSecurity(gSystemsList[srcScout.in_system_id].security_status));
+            myColorLine.push(ColorFromSecurity(gSystemsList[dstScout.in_system_id].security_status));
             myColors.push(myColorLine);
 
             myLine = new Array();
@@ -773,8 +773,8 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
-            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1.0));
+            myColorLine.push(ColorFromSecurity(gSystemsList[srcScout.in_system_id].security_status));
+            myColorLine.push(ColorFromSecurity(gSystemsList[dstScout.out_system_id].security_status));
             myColors.push(myColorLine);
 
 
@@ -787,12 +787,12 @@ function ProcessScouts(response) {
                 + ")";
             AddMenuItem(groupString, srcText);
             var dstText = gSystemsList[srcScout.in_system_id].name
-                + " ( Time Remaining: " + srcScout.remaining_hours
+                + " ( Time Remaining: " + srcScout.remaining_hours + " , " + srcScout.remaining_hours
                 + ")";
             AddMenuItem(groupString, dstText);
 
             var dstText = gSystemsList[dstScout.in_system_id].name
-            + " ( Time Remaining: " + dstScout.remaining_hours
+            + " ( Distance: " + jumpableWormHoles[w].distance.toFixed(1)
                 + ")";
             AddMenuItem(groupString, dstText);
 
