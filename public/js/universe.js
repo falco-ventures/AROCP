@@ -657,11 +657,11 @@ function ProcessScouts(response) {
 
             if (srcSystem.name == "Thera") {
                 thera = srcSystem;
-                theraConnectedSystems[destSystem.system_id] = scout_data.out_signature;
+                theraConnectedSystems[destSystem.system_id] = scout_data;
             }
             if (destSystem.name == "Thera") {
                 thera = destSystem;
-                theraConnectedSystems[srcSystem.system_id] = scout_data.in_signature;
+                theraConnectedSystems[srcSystem.system_id] = scout_data;
             }
             //Gather up all wormhole systems and a reference to their scout sonnection
             if (srcSystem.systemType == "WormholeSpace") {
@@ -779,29 +779,34 @@ function ProcessScouts(response) {
 
             var srcText = gSystemsList[srcScout.out_system_id].name
                 + " (" + (srcScout.out_signature)
+                + " - " + (srcScout.in_signature)
                 + ")";
             AddMenuItem(groupString, srcText);
             var dstText = gSystemsList[srcScout.in_system_id].name
-                + " (" + (srcScout.in_signature)
+                + " (" + ("Jump")
                 + ")";
             AddMenuItem(groupString, dstText);
 
             var dstText = gSystemsList[dstScout.in_system_id].name
-                + " (" + (dstScout.in_signature)
+                + " (" + ("Jump")
                 + ")";
             AddMenuItem(groupString, dstText);
 
             var srcText = gSystemsList[dstScout.out_system_id].name
                 + " (" + (dstScout.out_signature)
+                + " - " + (dstScout.in_signature)
                 + ")";
             AddMenuItem(groupString, srcText);
         }
 
         for (const system_id in theraConnectedSystems) {
-            var wormholeSig = theraConnectedSystems[system_id];
+            var scoutData = theraConnectedSystems[system_id];
+            var wormholeSig = " (" + (scoutData.out_signature)
+                + " - " + (scoutData.in_signature)
+                + ")";
             var system = gSystemsList[system_id];
             if (system.security_status >= 0.5) {
-                var destString = system.name + " (" + wormholeSig + "," + system.security_status.toFixed(1) + ")";
+                var destString = system.name + wormholeSig + " Sec: " + system.security_status.toFixed(1) + ")";
                 AddMenuItem("Thera", destString);
                 var myLine = new Array();
                 myLine.push(Get3DPositionFromSystem(thera))
