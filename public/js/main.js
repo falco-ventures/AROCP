@@ -142,7 +142,7 @@ function ProcessCharacterRoute(data) {
 }
 function ProcessCharacterLocation(data) {
     if (data != undefined) {
-        console.log("Requested Character Info and got " + data.responseText);
+        console.log("Requested Character Location and got " + data.responseText);
 
         try {
             var characterLocationInfo = JSON.parse(data.responseText);
@@ -176,13 +176,17 @@ function ProcessCharacterLocation(data) {
                 }
 
             }
-            var base = "https://esi.evetech.net/latest/characters/" + character.CharacterID + "/";
-            var paramString = "datasource=tranquility";
-            var command_type = "GET";
-            var headers = {};
-            headers["Content-Type"] = "application/json";
-            headers["Authorization"] = "Bearer " + loginCredentials.access_token;
-            sendCommand(base, paramString, ValidateCorp, command_type, headers, null, loginCredentials);
+            // var base = "https://esi.evetech.net/latest/characters/" + character.CharacterID + "/";
+            // var base = "https://esi.evetech.net/latest/characters/" + character.CharacterID + "/";
+            // var paramString = "datasource=tranquility";
+            // var command_type = "GET";
+            // var headers = {};
+            // headers["Content-Type"] = "application/json";
+            // headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+            // sendCommand(base, paramString, ValidateCorp, command_type, headers, null, loginCredentials);
+
+
+            
         } catch (e) {
 
         }
@@ -223,6 +227,14 @@ function verification_callback(data, loginCredentials) {
                 headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
                 sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+
+                var base = "https://instacardapp.com/AROCP/public/php/character.php";
+                var paramString = "code=" + code + "&character";
+                var command_type = "GET";
+                var headers = {};
+                headers["Content-Type"] = "application/json";
+                var callback_data = code;
+                sendCommand(base, paramString, ValidateCorp, command_type, headers, null, callback_data);
             }
         } catch (e) {
 
