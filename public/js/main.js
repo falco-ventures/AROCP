@@ -291,7 +291,7 @@ function authorize_character_code(code) {
     var command_type = "GET";
     var headers = {};
     headers["Content-Type"] = "application/json";
-    var callback_data = code;
+    var callback_data = loginCredentials;
     sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
 }
 

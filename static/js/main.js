@@ -193,7 +193,7 @@ function ProcessCharacterLocation(data) {
 
     }
 }
-function verification_callback(data, loginCredentials) {
+function verification_callback(data, access_token) {
     if (data != undefined) {
 
         // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
@@ -220,7 +220,7 @@ function verification_callback(data, loginCredentials) {
                 gCharacterInfo.push(characterInfo)
 
                 var base = "https://instacardapp.com/AROCP/public/php/location.php";
-                var paramString = "code=" + loginCredentials.access_token + "&character="+characterInfo.CharacterID;
+                var paramString = "code=" + access_token + "&character="+characterInfo.CharacterID;
                 var command_type = "GET";
                 var headers = {};
                 headers["Content-Type"] = "application/json";
