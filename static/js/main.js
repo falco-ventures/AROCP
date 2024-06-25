@@ -177,13 +177,13 @@ function ProcessCharacterLocation(data) {
                     } else {
 
                         var base = "https://instacardapp.com/AROCP/public/php/route.php";
-                        var paramString = "code=" + characterInfo.access_token
+                        var paramString = "code=" + character.access_token
                             + "&src=" + system.system_id
                             + "&dst=" + destSystem.system_id;
                         var command_type = "GET";
                         var headers = {};
                         headers["Content-Type"] = "application/json";
-                        headers["Authorization"] = "Bearer " + characterInfo.access_token;
+                        headers["Authorization"] = "Bearer " + character.access_token;
 
                         sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, characterInfo);
 
