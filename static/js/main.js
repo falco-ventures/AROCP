@@ -185,7 +185,7 @@ function ProcessCharacterLocation(data) {
                         headers["Content-Type"] = "application/json";
                         headers["Authorization"] = "Bearer " + character.access_token;
 
-                        sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, characterInfo);
+                        sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, character);
 
 
                     }
