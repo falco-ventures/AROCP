@@ -248,7 +248,7 @@ function verification_callback(data, code) {
     }
 }
 function authorize_character_code_local(code) {
-    var base = "http://127.0.0.1:8000/eve/token";
+    var base = "http://localhost:8000/eve/token";
     var paramString = "code=" + encodeURIComponent(code);
     var command_type = "GET";
     var headers = {};
@@ -258,8 +258,7 @@ function authorize_character_code_local(code) {
 
     sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
 }
-
-
+//https://falco-ventures.github.io/AROCP/
 
 
 function authorize_character_code(code) {
