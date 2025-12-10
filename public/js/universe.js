@@ -43,11 +43,35 @@ var gJitaCenter = [-1.29064861735e+17, 6.075530691e+16, - 1.1746922706e+17];
 var gInitialized = false;
 
 function click_login() {
-    // var eveServer = "https://login.eveonline.com/oauth/authorize"
-    // var scopes = "response_type=code&redirect_uri=https://falco-ventures.github.io/AROCP/&client_id=5fe7b21736e748c6a78d9e4f98ff536e&scope=publicData%20esi-location.read_location.v1%20esi-location.read_ship_type.v1%20esi-skills.read_skills.v1%20esi-skills.read_skillqueue.v1%20esi-universe.read_structures.v1%20esi-ui.write_waypoint.v1%20esi-fittings.read_fittings.v1%20esi-fittings.write_fittings.v1%20esi-location.read_online.v1%20esi-clones.read_implants.v1%20esi-characters.read_fatigue.v1";
-    window.location = "https://login.eveonline.com/v2/oauth/authorize?response_type=code&redirect_uri=https%3A%2F%2Ffalco-ventures.github.io%2FAROCP%2Fmap%2Findex.htm&client_id=5fe7b21736e748c6a78d9e4f98ff536e&scope=publicData%20esi-location.read_location.v1%20esi-location.read_ship_type.v1%20esi-skills.read_skillqueue.v1%20esi-universe.read_structures.v1%20esi-fleets.read_fleet.v1%20esi-fleets.write_fleet.v1%20esi-ui.write_waypoint.v1%20esi-fittings.read_fittings.v1%20esi-fittings.write_fittings.v1%20esi-location.read_online.v1%20esi-clones.read_implants.v1%20"
+    const clientId = "5fe7b21736e748c6a78d9e4f98ff536e";
+    const redirectUri = "https://falco-ventures.github.io/AROCP/map/index.html";
 
+    const scopes = [
+        "publicData",
+        "esi-location.read_location.v1",
+        "esi-location.read_ship_type.v1",
+        "esi-skills.read_skillqueue.v1",
+        "esi-universe.read_structures.v1",
+        "esi-fleets.read_fleet.v1",
+        "esi-fleets.write_fleet.v1",
+        "esi-ui.write_waypoint.v1",
+        "esi-fittings.read_fittings.v1",
+        "esi-fittings.write_fittings.v1",
+        "esi-location.read_online.v1",
+        "esi-clones.read_implants.v1",
+        "esi-characters.read_fatigue.v1"
+    ];
+
+    const authUrl =
+        "https://login.eveonline.com/v2/oauth/authorize" +
+        "?response_type=code" +
+        "&redirect_uri=" + encodeURIComponent(redirectUri) +
+        "&client_id=" + encodeURIComponent(clientId) +
+        "&scope=" + encodeURIComponent(scopes.join(" "));
+
+    window.location = authUrl;
 }
+
 function download_json(fileName, json) {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
     var dlAnchorElem = document.getElementById('downloadAnchorElem');
