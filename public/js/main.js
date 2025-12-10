@@ -234,6 +234,7 @@ function authorize_character_code_local(code) {
     sendCommand(base, paramString, authorization_callback, command_type, headers, body, callback_data);
 }
 
+
 function authorize_character_code(code) {
     var base = "https://falco-ventures.github.io/AROCP/php/api.php";
     var paramString = "code=" + code;
