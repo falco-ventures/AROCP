@@ -42,12 +42,10 @@ var gJitaCenter = [-1.29064861735e+17, 6.075530691e+16, - 1.1746922706e+17];
 
 var gInitialized = false;
 
-
-
 function click_login() {
-    var eveServer = "https://login.eveonline.com/oauth/authorize"
-    var scopes = "response_type=code&redirect_uri=https://falco-ventures.github.io/AROCP/&client_id=5fe7b21736e748c6a78d9e4f98ff536e&scope=publicData%20esi-location.read_location.v1%20esi-location.read_ship_type.v1%20esi-skills.read_skills.v1%20esi-skills.read_skillqueue.v1%20esi-universe.read_structures.v1%20esi-ui.write_waypoint.v1%20esi-fittings.read_fittings.v1%20esi-fittings.write_fittings.v1%20esi-location.read_online.v1%20esi-clones.read_implants.v1%20esi-characters.read_fatigue.v1";
-    window.location = eveServer + "?" + scopes;
+    // var eveServer = "https://login.eveonline.com/oauth/authorize"
+    // var scopes = "response_type=code&redirect_uri=https://falco-ventures.github.io/AROCP/&client_id=5fe7b21736e748c6a78d9e4f98ff536e&scope=publicData%20esi-location.read_location.v1%20esi-location.read_ship_type.v1%20esi-skills.read_skills.v1%20esi-skills.read_skillqueue.v1%20esi-universe.read_structures.v1%20esi-ui.write_waypoint.v1%20esi-fittings.read_fittings.v1%20esi-fittings.write_fittings.v1%20esi-location.read_online.v1%20esi-clones.read_implants.v1%20esi-characters.read_fatigue.v1";
+    window.location = "https://login.eveonline.com/v2/oauth/authorize?response_type=code&redirect_uri=https%3A%2F%2Ffalco-ventures.github.io%2FAROCP%2Fmap%2Findex.htm&client_id=5fe7b21736e748c6a78d9e4f98ff536e&scope=publicData%20esi-location.read_location.v1%20esi-location.read_ship_type.v1%20esi-skills.read_skillqueue.v1%20esi-universe.read_structures.v1%20esi-fleets.read_fleet.v1%20esi-fleets.write_fleet.v1%20esi-ui.write_waypoint.v1%20esi-fittings.read_fittings.v1%20esi-fittings.write_fittings.v1%20esi-location.read_online.v1%20esi-clones.read_implants.v1%20"
 
 }
 function download_json(fileName, json) {
