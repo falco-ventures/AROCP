@@ -248,29 +248,17 @@ function verification_callback(data, code) {
     }
 }
 function authorize_character_code_local(code) {
-    const clientId = "5fe7b21736e748c6a78d9e4f98ff536e";
-    const clientSecret = "5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU";
+    var base = "http://127.0.0.1:8000/eve/token";
+    var paramString = "code=" + encodeURIComponent(code);
+    var command_type = "GET";
+    var headers = {};
+    headers["Content-Type"] = "application/json";
 
-    // Basic <base64(client_id:client_secret)>
-    const auth = btoa(clientId + ":" + clientSecret);
+    var callback_data = code;
 
-    const base = "https://login.eveonline.com/v2/oauth/token";
-    const paramString = "";
-    const command_type = "POST";
-    const headers = {};
-
-    headers["Content-Type"] = "application/x-www-form-urlencoded";
-    headers["Authorization"] = "Basic " + auth;
-
-    // Form-encoded body per SSO docs
-    const body =
-        "grant_type=authorization_code" +
-        "&code=" + encodeURIComponent(code);
-
-    const callback_data = { code: code };
-
-    sendCommand(base, paramString, authorization_callback, command_type, headers, body, callback_data);
+    sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
 }
+
 
 
 
