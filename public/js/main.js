@@ -176,7 +176,7 @@ function ProcessCharacterLocation(data) {
                         sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, loginCredentials);
                     } else {
 
-                        var base = "https://instacardapp.com/AROCP/public/php/route.php";
+                        var base = "https://falco-ventures.github.io/AROCP/php/route.php";
                         var paramString = "code=" + character.access_token
                             + "&src=" + system.system_id
                             + "&dst=" + destSystem.system_id;
@@ -249,7 +249,7 @@ function verification_callback(data, code) {
 
                     sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
                 } else {
-                    var base = "https://instacardapp.com/AROCP/public/php/location.php";
+                    var base = "https://falco-ventures.github.io/AROCP/php/location.php";
                     var paramString = "code=" + characterInfo.access_token + "&character=" + characterInfo.CharacterID;
                     var command_type = "GET";
                     var headers = {};
@@ -260,7 +260,7 @@ function verification_callback(data, code) {
 
                 }
 
-                var base = "https://instacardapp.com/AROCP/public/php/character.php";
+                var base = "https://falco-ventures.github.io/AROCP/php/character.php";
                 // var base = "https://esi.evetech.net/latest/characters/2122278309/?datasource=tranquility";
                 var paramString = "code=" + code + "&character=" + characterInfo.CharacterID;
                 var command_type = "GET";
@@ -321,7 +321,7 @@ function authorize_character_code_local(code) {
 }
 
 function authorize_character_code(code) {
-    var base = "https://instacardapp.com/AROCP/public/php/api.php";
+    var base = "https://falco-ventures.github.io/AROCP/php/api.php";
     var paramString = "code=" + code;
     var command_type = "GET";
     var headers = {};

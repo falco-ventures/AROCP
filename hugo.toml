@@ -1,4 +1,4 @@
-baseURL = 'https://instacardapp.com/AROCP/public/'
+baseURL = 'https://falco-ventures.github.io/AROCP/'
 languageCode = 'en-us'
 title = 'AeroCorp'
 theme = 'ananke'
