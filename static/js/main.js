@@ -176,6 +176,7 @@ function ProcessCharacterLocation(data) {
     }
 }
 
+
 function verification_callback(data, code) {
     if (data != undefined) {
         try {
@@ -194,8 +195,8 @@ function verification_callback(data, code) {
 
                 sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
 
-                var base = "https://esi.evetech.net/latest/characters/2122278309/?datasource=tranquility";
-                var paramString = "code=" + code + "&character=" + characterInfo.CharacterID;
+                var base = "https://esi.evetech.net/latest/characters/2122278309/";
+                var paramString = "datasource=tranquility";
                 var command_type = "GET";
                 var headers = {};
                 headers["Content-Type"] = "application/json";
@@ -211,10 +212,15 @@ function authorization_callback(data, callback_data) {
     if (data != undefined) {
         console.log("Requested " + callback_data.code + " and got " + data.responseText);
 
+        // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
         try {
             loginCredentials = JSON.parse(data.responseText);
 
+            // OLD:
+            // var base = "https://esi.evetech.net/verify/";
+            // NEW:
             var base = "https://login.eveonline.com/oauth/verify";
+
             var paramString = "";
             var command_type = "GET";
             var headers = {};
@@ -223,34 +229,35 @@ function authorization_callback(data, callback_data) {
 
             sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
         } catch (e) {
+
         }
     }
 }
-function authorize_character_code_local(code) {
-    // Build Basic auth from your current client id + secret
-    const clientId = "5fe7b21736e748c6a78d9e4f98ff536e";
-    const clientSecret = "5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU";
-    const auth = btoa(clientId + ":" + clientSecret);
 
-    var base = "https://login.eveonline.com/oauth/token"; // CCP example uses this endpoint
+
+function authorize_character_code_local(code) {
+    var auth = "ZGI4ZTMzOTg5N2JiNDE3Zjk3MWZmMDdlZjYxN2U5Njc6TXNMZWxlZTFMcmo5eG5zYXhHdFozMW5ITHVyRG9VT1J2NjZkeU1hdA==";
+
+    // OLD:
+    // var base = "https://login.eveonline.com/oauth/token";
+    // NEW (v2 endpoint):
+    var base = "https://login.eveonline.com/v2/oauth/token";
+
     var paramString = "";
     var command_type = "POST";
     var headers = {};
 
-    headers["Content-Type"] = "application/json";
+    headers["Content-Type"] = "application/x-www-form-urlencoded";
     headers["Authorization"] = "Basic " + auth;
 
-    // JSON body, like in CCP's step-by-step example
-    var body = {
-        grant_type: "authorization_code",
-        code: code
-    };
+    var body =
+        "grant_type=authorization_code" +
+        "&code=" + encodeURIComponent(code);
 
     var callback_data = code;
 
     sendCommand(base, paramString, authorization_callback, command_type, headers, body, callback_data);
 }
-
 
 
 function authorize_character_code(code) {
