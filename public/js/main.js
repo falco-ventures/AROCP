@@ -244,6 +244,7 @@ function verification_callback(data, code) {
                 var command_type = "GET";
                 var headers = {};
                 headers["Content-Type"] = "application/json";
+                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
                 // headers["Authorization"] = "Bearer " + code;
                 sendCommand(base, paramString, ValidateCorp, command_type, headers, null, code);
             }
