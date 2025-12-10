@@ -332,11 +332,11 @@ function authorize_character_code(code) {
 
 function download_character_info() {
     for (i in gCharacterCodes) {
-        if (window.location.href.includes("localhost"))
-            authorize_character_code_local(gCharacterCodes[i]);
-        else
+        // if (window.location.href.includes("localhost"))
+        authorize_character_code_local(gCharacterCodes[i]);
+        // else
 
-            authorize_character_code(gCharacterCodes[i]);
+        //     authorize_character_code(gCharacterCodes[i]);
     }
 }
 function loadExternalFile(file, callback) {
