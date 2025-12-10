@@ -235,6 +235,37 @@ function authorize_character_code_local(code) {
 }
 
 
+function verification_callback(data, code) {
+    if (data != undefined) {
+        try {
+            var characterInfo = JSON.parse(data.responseText);
+            if (characterInfo != undefined && characterInfo.CharacterName != undefined) {
+                console.log(JSON.stringify(characterInfo));
+
+                gCharacterInfo.push(characterInfo)
+
+                var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
+                var paramString = "datasource=tranquility";
+                var command_type = "GET";
+                var headers = {};
+                headers["Content-Type"] = "application/json";
+                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+
+                sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+
+                var base = "https://esi.evetech.net/latest/characters/2122278309/";
+                var paramString = "datasource=tranquility";
+                var command_type = "GET";
+                var headers = {};
+                headers["Content-Type"] = "application/json";
+                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+                // headers["Authorization"] = "Bearer " + code;
+                sendCommand(base, paramString, ValidateCorp, command_type, headers, null, code);
+            }
+        } catch (e) {
+        }
+    }
+}
 
 function authorize_character_code(code) {
     var base = "https://falco-ventures.github.io/AROCP/php/api.php";
