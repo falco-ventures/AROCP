@@ -176,37 +176,25 @@ function ProcessCharacterLocation(data) {
     }
 }
 
-
-function verification_callback(data, code) {
+function authorization_callback(data, callback_data) {
     if (data != undefined) {
+        console.log("Requested " + callback_data.code + " and got " + data.responseText);
         try {
-            var characterInfo = JSON.parse(data.responseText);
-            if (characterInfo != undefined && characterInfo.CharacterName != undefined) {
-                console.log(JSON.stringify(characterInfo));
+            loginCredentials = JSON.parse(data.responseText);
 
-                gCharacterInfo.push(characterInfo)
+            var base = "https://login.eveonline.com/oauth/verify";
+            var paramString = "";
+            var command_type = "GET";
+            var headers = {};
+            headers["Content-Type"] = "application/json";
+            headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
-                var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
-                var paramString = "datasource=tranquility";
-                var command_type = "GET";
-                var headers = {};
-                headers["Content-Type"] = "application/json";
-                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
-
-                sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
-
-                var base = "https://esi.evetech.net/latest/characters/2122278309/";
-                var paramString = "datasource=tranquility";
-                var command_type = "GET";
-                var headers = {};
-                headers["Content-Type"] = "application/json";
-                headers["Authorization"] = "Bearer " + code;
-                sendCommand(base, paramString, ValidateCorp, command_type, headers, null, code);
-            }
+            sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
         } catch (e) {
         }
     }
 }
+
 
 function authorization_callback(data, callback_data) {
     if (data != undefined) {
@@ -234,30 +222,33 @@ function authorization_callback(data, callback_data) {
     }
 }
 
-
 function authorize_character_code_local(code) {
-    var auth = "ZGI4ZTMzOTg5N2JiNDE3Zjk3MWZmMDdlZjYxN2U5Njc6TXNMZWxlZTFMcmo5eG5zYXhHdFozMW5ITHVyRG9VT1J2NjZkeU1hdA==";
+    const clientId = "5fe7b21736e748c6a78d9e4f98ff536e";
+    const clientSecret = "5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU";
 
-    // OLD:
-    // var base = "https://login.eveonline.com/oauth/token";
-    // NEW (v2 endpoint):
-    var base = "https://login.eveonline.com/v2/oauth/token";
+    // Basic <base64(client_id:client_secret)>
+    const auth = btoa(clientId + ":" + clientSecret);
 
-    var paramString = "";
-    var command_type = "POST";
-    var headers = {};
+    const base = "https://login.eveonline.com/v2/oauth/token";
+    const paramString = "";
+    const command_type = "POST";
+    const headers = {};
 
     headers["Content-Type"] = "application/x-www-form-urlencoded";
     headers["Authorization"] = "Basic " + auth;
 
-    var body =
+    // Form-encoded body per SSO docs
+    const body =
         "grant_type=authorization_code" +
         "&code=" + encodeURIComponent(code);
+    // you *can* also add:
+    // + "&redirect_uri=" + encodeURIComponent("https://falco-ventures.github.io/AROCP/map/index.html");
 
-    var callback_data = code;
+    const callback_data = { code: code };
 
     sendCommand(base, paramString, authorization_callback, command_type, headers, body, callback_data);
 }
+
 
 
 function authorize_character_code(code) {

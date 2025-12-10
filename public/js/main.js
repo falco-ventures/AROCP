@@ -174,19 +174,14 @@ function ProcessCharacterLocation(data) {
         }
     }
 }
+
 function authorization_callback(data, callback_data) {
     if (data != undefined) {
         console.log("Requested " + callback_data.code + " and got " + data.responseText);
-
-        // curl -XGET -H 'Authorization: Bearer {access token from the previous step}' https://login.eveonline.com/oauth/verify
         try {
             loginCredentials = JSON.parse(data.responseText);
 
-            // OLD:
-            // var base = "https://esi.evetech.net/verify/";
-            // NEW:
             var base = "https://login.eveonline.com/oauth/verify";
-
             var paramString = "";
             var command_type = "GET";
             var headers = {};
@@ -195,10 +190,10 @@ function authorization_callback(data, callback_data) {
 
             sendCommand(base, paramString, verification_callback, command_type, headers, null, callback_data);
         } catch (e) {
-
         }
     }
 }
+
 
 function authorization_callback(data, callback_data) {
     if (data != undefined) {
@@ -253,25 +248,28 @@ function verification_callback(data, code) {
     }
 }
 function authorize_character_code_local(code) {
-    var auth = "ZGI4ZTMzOTg5N2JiNDE3Zjk3MWZmMDdlZjYxN2U5Njc6TXNMZWxlZTFMcmo5eG5zYXhHdFozMW5ITHVyRG9VT1J2NjZkeU1hdA==";
+    const clientId = "5fe7b21736e748c6a78d9e4f98ff536e";
+    const clientSecret = "5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU";
 
-    // OLD:
-    // var base = "https://login.eveonline.com/oauth/token";
-    // NEW (v2 endpoint):
-    var base = "https://login.eveonline.com/v2/oauth/token";
+    // Basic <base64(client_id:client_secret)>
+    const auth = btoa(clientId + ":" + clientSecret);
 
-    var paramString = "";
-    var command_type = "POST";
-    var headers = {};
+    const base = "https://login.eveonline.com/v2/oauth/token";
+    const paramString = "";
+    const command_type = "POST";
+    const headers = {};
 
     headers["Content-Type"] = "application/x-www-form-urlencoded";
     headers["Authorization"] = "Basic " + auth;
 
-    var body =
+    // Form-encoded body per SSO docs
+    const body =
         "grant_type=authorization_code" +
         "&code=" + encodeURIComponent(code);
+    // you *can* also add:
+    // + "&redirect_uri=" + encodeURIComponent("https://falco-ventures.github.io/AROCP/map/index.html");
 
-    var callback_data = code;
+    const callback_data = { code: code };
 
     sendCommand(base, paramString, authorization_callback, command_type, headers, body, callback_data);
 }
