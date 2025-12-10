@@ -102,7 +102,7 @@ function ProcessConstellation(cData_i) {
         if (gCurrentConstellationIO < constellationIDs.length) {
             GetNextConstellation();
         } else {
-            download_json("/map/constellations.json", gConstellations);
+            download_json("/AROCP/map/constellations.json", gConstellations);
         }
 
     }
@@ -137,7 +137,7 @@ function ProcessRegion(cData_i) {
         if (gCurrentRegionIO < regionIDs.length) {
             GetNextRegion();
         } else {
-            download_json("/map/regions.json", gRegions);
+            download_json("/AROCP/map/regions.json", gRegions);
         }
 
 
@@ -171,12 +171,12 @@ function ProcessGate(cData_i) {
         if (gCurrentGateIO < gGateIDs.length) {
             GetNextGate();
         } else {
-            download_json("/map/gates.json", gGates);
+            download_json("/AROCP/map/gates.json", gGates);
             InitializeGates();
         }
 
     } catch {
-        download_json("/map/gates.json", gGates);
+        download_json("/AROCP/map/gates.json", gGates);
         InitializeGates();
     }
 }
@@ -201,7 +201,7 @@ function GetNextGate(data_i) {
 }
 function LoadSystemsJSON() {
     //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-    loadExternalFile("/map/constellations.json", function (text) {
+    loadExternalFile("/AROCP/map/constellations.json", function (text) {
         try {
             gConstellations = JSON.parse(text);
         } catch {
@@ -209,7 +209,7 @@ function LoadSystemsJSON() {
             sendCommand("https://esi.evetech.net/latest/universe/constellations/", "datasource=tranquility", GetNextConstellation);
         }
         //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-        loadExternalFile("/map/regions.json", function (text) {
+        loadExternalFile("/AROCP/map/regions.json", function (text) {
             try {
                 gRegions = JSON.parse(text);
             } catch {
@@ -218,7 +218,7 @@ function LoadSystemsJSON() {
             }
 
             //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-            loadExternalFile("/map/systems.json", function (text) {
+            loadExternalFile("/AROCP/map/systems.json", function (text) {
                 try {
                     gSystems = JSON.parse(text);
                     startApplication(gSystems);
@@ -513,7 +513,7 @@ function InitializeUniverse(systems_json) {
         }
     }
     //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-    loadExternalFile("/map/gates.json", function (text) {
+    loadExternalFile("/AROCP/map/gates.json", function (text) {
         try {
             gGates = JSON.parse(text);
             InitializeGates()
