@@ -165,30 +165,30 @@ function ProcessCharacterLocation(data) {
                 var destSystem = gSystemsList[system_id];
                 if (destSystem.systemType == "NewEden") {
 
-                    if (window.location.href.includes("localhost")) {
-                        var base = "https://esi.evetech.net/latest/route/" + system.system_id + "/" + destSystem.system_id + "/";
-                        var paramString = "datasource=tranquility";
-                        var command_type = "GET";
-                        var headers = {};
-                        headers["Content-Type"] = "application/json";
-                        headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+                    // if (window.location.href.includes("localhost")) {
+                    var base = "https://esi.evetech.net/latest/route/" + system.system_id + "/" + destSystem.system_id + "/";
+                    var paramString = "datasource=tranquility";
+                    var command_type = "GET";
+                    var headers = {};
+                    headers["Content-Type"] = "application/json";
+                    headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
-                        sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, loginCredentials);
-                    } else {
+                    sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, loginCredentials);
+                    // } else {
 
-                        var base = "https://falco-ventures.github.io/AROCP/php/route.php";
-                        var paramString = "code=" + character.access_token
-                            + "&src=" + system.system_id
-                            + "&dst=" + destSystem.system_id;
-                        var command_type = "GET";
-                        var headers = {};
-                        headers["Content-Type"] = "application/json";
-                        headers["Authorization"] = "Bearer " + character.access_token;
+                    //     var base = "https://falco-ventures.github.io/AROCP/php/route.php";
+                    //     var paramString = "code=" + character.access_token
+                    //         + "&src=" + system.system_id
+                    //         + "&dst=" + destSystem.system_id;
+                    //     var command_type = "GET";
+                    //     var headers = {};
+                    //     headers["Content-Type"] = "application/json";
+                    //     headers["Authorization"] = "Bearer " + character.access_token;
 
-                        sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, character);
+                    //     sendCommand(base, paramString, ProcessCharacterRoute, command_type, headers, null, character);
 
 
-                    }
+                    // }
                 }
 
             }
@@ -239,29 +239,29 @@ function verification_callback(data, code) {
 
                 gCharacterInfo.push(characterInfo)
 
-                if (window.location.href.includes("localhost")) {
-                    var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
-                    var paramString = "datasource=tranquility";
-                    var command_type = "GET";
-                    var headers = {};
-                    headers["Content-Type"] = "application/json";
-                    headers["Authorization"] = "Bearer " + loginCredentials.access_token;
+                // if (window.location.href.includes("localhost")) {
+                var base = "https://esi.evetech.net/latest/characters/" + characterInfo.CharacterID + "/location/";
+                var paramString = "datasource=tranquility";
+                var command_type = "GET";
+                var headers = {};
+                headers["Content-Type"] = "application/json";
+                headers["Authorization"] = "Bearer " + loginCredentials.access_token;
 
-                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
-                } else {
-                    var base = "https://falco-ventures.github.io/AROCP/php/location.php";
-                    var paramString = "code=" + characterInfo.access_token + "&character=" + characterInfo.CharacterID;
-                    var command_type = "GET";
-                    var headers = {};
-                    headers["Content-Type"] = "application/json";
-                    headers["Authorization"] = "Bearer " + characterInfo.access_token;
+                sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, loginCredentials);
+                // } else {
+                //     var base = "https://falco-ventures.github.io/AROCP/php/location.php";
+                //     var paramString = "code=" + characterInfo.access_token + "&character=" + characterInfo.CharacterID;
+                //     var command_type = "GET";
+                //     var headers = {};
+                //     headers["Content-Type"] = "application/json";
+                //     headers["Authorization"] = "Bearer " + characterInfo.access_token;
 
-                    sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, characterInfo);
+                //     sendCommand(base, paramString, ProcessCharacterLocation, command_type, headers, null, characterInfo);
 
-                }
+                // }
 
-                var base = "https://falco-ventures.github.io/AROCP/php/character.php";
-                // var base = "https://esi.evetech.net/latest/characters/2122278309/?datasource=tranquility";
+                // var base = "https://falco-ventures.github.io/AROCP/php/character.php";
+                var base = "https://esi.evetech.net/latest/characters/2122278309/?datasource=tranquility";
                 var paramString = "code=" + code + "&character=" + characterInfo.CharacterID;
                 var command_type = "GET";
                 var headers = {};
