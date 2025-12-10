@@ -223,7 +223,7 @@ function authorization_callback(data, callback_data) {
 }
 
 function authorize_character_code_local(code) {
-    var base = "http://localhost:8000/eve/token";
+    var base = "https://localhost:8000/eve/token";
     var paramString = "code=" + encodeURIComponent(code);
     var command_type = "GET";
     var headers = {};

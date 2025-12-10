@@ -1,128 +1,102 @@
 #!/usr/bin/env python3
-import base64
-import os
-import sys
-from flask import Flask, request, jsonify, make_response
-import requests
+import json, urllib.parse, urllib.request, ssl
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
-app = Flask(__name__)
-
-# === CONFIG ===
-CLIENT_ID = os.environ.get("EVE_CLIENT_ID", "5fe7b21736e748c6a78d9e4f98ff536e")
-CLIENT_SECRET = os.environ.get("EVE_CLIENT_SECRET", "5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU")
+CLIENT_ID     = "5fe7b21736e748c6a78d9e4f98ff536e"
+CLIENT_SECRET = "5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU"
 
 TOKEN_URL = "https://login.eveonline.com/v2/oauth/token"
 VERIFY_URL = "https://login.eveonline.com/oauth/verify"
 
-ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "https://falco-ventures.github.io")
+ALLOWED_ORIGIN = "https://falco-ventures.github.io"
 
+class Handler(BaseHTTPRequestHandler):
+    def _set_headers(self):
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", ALLOWED_ORIGIN)
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
 
-@app.after_request
-def add_cors_headers(response):
-    response.headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGIN
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-    return response
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self._set_headers()
+        self.end_headers()
 
+    def do_GET(self):
+        if not self.path.startswith("/eve/token"):
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b'{"error":"not_found"}')
+            return
 
-@app.route("/")
-def root():
-    return "EVE SSO helper is running."
+        qs = urllib.parse.urlparse(self.path).query
+        params = urllib.parse.parse_qs(qs)
+        code = params.get("code", [None])[0]
 
+        if not code:
+            self.send_response(400)
+            self._set_headers()
+            self.end_headers()
+            self.wfile.write(b'{"error":"missing_code"}')
+            return
 
-@app.route("/eve/token", methods=["GET", "POST", "OPTIONS"])
-def eve_token():
-    # Handle preflight
-    if request.method == "OPTIONS":
-        return make_response("", 204)
+        # Exchange authorization code for access token
+        data = urllib.parse.urlencode({
+            "grant_type": "authorization_code",
+            "code": code,
+        }).encode()
 
-    # 1) Get code
-    code = request.args.get("code")
-    if not code and request.is_json:
-        code = (request.get_json() or {}).get("code")
+        auth_header = f"{CLIENT_ID}:{CLIENT_SECRET}".encode()
+        auth_value = "Basic " + ssl._base64encode(auth_header).decode()
 
-    if not code:
-        return jsonify({"error": "missing_code", "error_description": "No 'code' parameter provided"}), 400
+        req = urllib.request.Request(TOKEN_URL, data=data)
+        req.add_header("Content-Type", "application/x-www-form-urlencoded")
+        req.add_header("Authorization", auth_value)
 
-    if not CLIENT_ID or not CLIENT_SECRET:
-        return jsonify({"error": "server_misconfigured", "error_description": "Missing client credentials"}), 500
-
-    print(f"[eve/token] Received code: {code}", file=sys.stderr)
-
-    # 2) Build Basic auth header
-    auth_bytes = f"{CLIENT_ID}:{CLIENT_SECRET}".encode("utf-8")
-    auth_b64 = base64.b64encode(auth_bytes).decode("utf-8")
-
-    # 3) Build form body EXACTLY as per SSO docs:
-    #    grant_type=authorization_code&code=...   (no redirect_uri here)
-    data = {
-        "grant_type": "authorization_code",
-        "code": code,
-    }
-
-    headers = {
-        "Authorization": f"Basic {auth_b64}",
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
-
-    # 4) Exchange code -> token
-    try:
-        print(f"[eve/token] POST {TOKEN_URL}", file=sys.stderr)
-        token_resp = requests.post(TOKEN_URL, data=data, headers=headers, timeout=10)
-        print(f"[eve/token] CCP status: {token_resp.status_code}", file=sys.stderr)
-        print(f"[eve/token] CCP raw body (truncated): {token_resp.text[:400]!r}", file=sys.stderr)
-    except Exception as e:
-        print(f"[eve/token] Exception talking to CCP: {e}", file=sys.stderr)
-        return jsonify({"error": "token_request_failed", "error_description": str(e)}), 502
-
-    content_type = token_resp.headers.get("Content-Type", "")
-    if "application/json" in content_type.lower():
         try:
-            token_json = token_resp.json()
+            resp = urllib.request.urlopen(req)
+            token_data = json.loads(resp.read())
         except Exception as e:
-            token_json = {"json_parse_error": str(e), "raw_body": token_resp.text[:400]}
-    else:
-        token_json = {"raw_body": token_resp.text[:400]}
+            self.send_response(500)
+            self._set_headers()
+            self.end_headers()
+            self.wfile.write(b'{"error":"token_exchange_failed"}')
+            return
 
-    # If CCP says error (400/401/500/etc), forward status and body
-    if not token_resp.ok:
-        return jsonify({
-            "error": "eve_sso_error",
-            "status": token_resp.status_code,
-            "token_response": token_json,
-        }), token_resp.status_code
+        # Now call VERIFY
+        verify_req = urllib.request.Request(VERIFY_URL)
+        verify_req.add_header("Authorization", "Bearer " + token_data["access_token"])
 
-    # 5) Verify the token to get character info
-    access_token = token_json.get("access_token")
-    verify_json = None
-
-    if access_token:
         try:
-            v_headers = {
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/json",
-            }
-            print(f"[eve/token] GET {VERIFY_URL}", file=sys.stderr)
-            verify_resp = requests.get(VERIFY_URL, headers=v_headers, timeout=10)
-            print(f"[eve/token] VERIFY status: {verify_resp.status_code}", file=sys.stderr)
-            print(f"[eve/token] VERIFY raw body (truncated): {verify_resp.text[:400]!r}", file=sys.stderr)
+            verify_resp = urllib.request.urlopen(verify_req)
+            verify_data = json.loads(verify_resp.read())
+        except:
+            verify_data = {"error": "verify_failed"}
 
-            if "application/json" in verify_resp.headers.get("Content-Type", "").lower():
-                verify_json = verify_resp.json()
-            else:
-                verify_json = {"raw_body": verify_resp.text[:400]}
-        except Exception as e:
-            verify_json = {"error": "verify_request_failed", "error_description": str(e)}
+        # Return combined payload
+        output = {
+            "token": token_data,
+            "verify": verify_data
+        }
 
-    result = {
-        "token": token_json,
-        "verify": verify_json,
-    }
-
-    return jsonify(result), 200
+        self.send_response(200)
+        self._set_headers()
+        self.end_headers()
+        self.wfile.write(json.dumps(output).encode())
 
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    print(f"Starting EVE SSO helper server on http://0.0.0.0:{port}")
-    app.run(host="0.0.0.0", port=port, debug=True)
+def run():
+    httpd = HTTPServer(("localhost", 8000), Handler)
+
+    # Load SSL certs
+    httpd.socket = ssl.wrap_socket(
+        httpd.socket,
+        keyfile="key.pem",
+        certfile="cert.pem",
+        server_side=True,
+    )
+
+    print("HTTPS Eve SSO helper running at https://localhost:8000/eve/token")
+    httpd.serve_forever()
+
+run()
