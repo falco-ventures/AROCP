@@ -102,7 +102,7 @@ function ProcessConstellation(cData_i) {
         if (gCurrentConstellationIO < constellationIDs.length) {
             GetNextConstellation();
         } else {
-            download_json("constellations.json", gConstellations);
+            download_json("map/constellations.json", gConstellations);
         }
 
     }
@@ -137,7 +137,7 @@ function ProcessRegion(cData_i) {
         if (gCurrentRegionIO < regionIDs.length) {
             GetNextRegion();
         } else {
-            download_json("regions.json", gRegions);
+            download_json("map/regions.json", gRegions);
         }
 
 
@@ -171,12 +171,12 @@ function ProcessGate(cData_i) {
         if (gCurrentGateIO < gGateIDs.length) {
             GetNextGate();
         } else {
-            download_json("gates.json", gGates);
+            download_json("map/gates.json", gGates);
             InitializeGates();
         }
 
     } catch {
-        download_json("gates.json", gGates);
+        download_json("map/gates.json", gGates);
         InitializeGates();
     }
 }
@@ -201,7 +201,7 @@ function GetNextGate(data_i) {
 }
 function LoadSystemsJSON() {
     //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-    loadExternalFile("constellations.json", function (text) {
+    loadExternalFile("map/constellations.json", function (text) {
         try {
             gConstellations = JSON.parse(text);
         } catch {
@@ -209,7 +209,7 @@ function LoadSystemsJSON() {
             sendCommand("https://esi.evetech.net/latest/universe/constellations/", "datasource=tranquility", GetNextConstellation);
         }
         //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-        loadExternalFile("regions.json", function (text) {
+        loadExternalFile("map/regions.json", function (text) {
             try {
                 gRegions = JSON.parse(text);
             } catch {
@@ -218,7 +218,7 @@ function LoadSystemsJSON() {
             }
 
             //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-            loadExternalFile("systems.json", function (text) {
+            loadExternalFile("map/systems.json", function (text) {
                 try {
                     gSystems = JSON.parse(text);
                     startApplication(gSystems);
@@ -513,7 +513,7 @@ function InitializeUniverse(systems_json) {
         }
     }
     //Try to load the systems.json file we scrape from Eve.  If it is not there, start scraping
-    loadExternalFile("gates.json", function (text) {
+    loadExternalFile("map/gates.json", function (text) {
         try {
             gGates = JSON.parse(text);
             InitializeGates()
@@ -763,8 +763,8 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0,1,0,1));
-            myColorLine.push(new BABYLON.Color4(0,1,0,1));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1));
             myColors.push(myColorLine);
 
             myLine = new Array();
@@ -792,7 +792,7 @@ function ProcessScouts(response) {
             AddMenuItem(groupString, dstText);
 
             var dstText = gSystemsList[dstScout.in_system_id].name
-            + " ( Distance: " + jumpableWormHoles[w].distance.toFixed(1)
+                + " ( Distance: " + jumpableWormHoles[w].distance.toFixed(1)
                 + ")";
             AddMenuItem(groupString, dstText);
 
@@ -810,7 +810,7 @@ function ProcessScouts(response) {
                 + ")";
             var system = gSystemsList[system_id];
             var destString = system.name + wormholeSig + " Time: " + scoutData.remaining_hours;
-            
+
             if (system.security_status >= 0.5) {
                 AddMenuItem("Thera1", destString);
             } else if (system.security_status >= 0.0) {
@@ -824,14 +824,14 @@ function ProcessScouts(response) {
             myLine.push(Get3DPositionFromSystem(system))
             myLines.push(myLine);
 
-            var lineColor=ColorFromSecurity(system.security_status);
+            var lineColor = ColorFromSecurity(system.security_status);
             var myColorLine = new Array();
             myColorLine.push(lineColor);
             myColorLine.push(lineColor);
             myColors.push(myColorLine);
 
 
-            
+
         }
         gScoutLines = create_gate_lines(myLines, myColors);
 

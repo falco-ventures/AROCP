@@ -120,7 +120,7 @@
 
 <body>
     <div class="images" style="width: 500px; height: 100%; float: left; background: rgb(0, 0, 0); overflow-y: scroll;">
-        
+
         <ul id="myUL">
             <li><span class="box">Universe</span>
                 <ul class="nested" id="Ranges">
@@ -164,12 +164,12 @@
                 </ul>
     </div>
     <div style="margin-left: 500px; height: 100%; background-color:black; ">
-        <canvas id="renderCanvas" ></canvas>
+        <canvas id="renderCanvas"></canvas>
     </div>
     <div class="images">
         <a id="downloadAnchorElem" href="javascript:click_download()">
-        <div class="bet_time2"><img width=256px src="skymap2.png" ></div>
-    </a>
+            <div class="bet_time2"><img width=256px src="skymap2.png"></div>
+        </a>
         <div class="bet_time"><img width=256px src="skymap1.jpg"></div>
         <div class="bet_time3"><img width=256px src="skymap3.jpg"></div>
         <div class="bet_time4"><img width=256px src="skymap4.jpg"></div>
@@ -378,10 +378,10 @@
         }
         function click_download() {
             var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gSystemMap));
-                var dlAnchorElem = document.getElementById('downloadAnchorElem');
-                dlAnchorElem.setAttribute("href", dataStr);
-                dlAnchorElem.setAttribute("download", "scene.json");
-                dlAnchorElem.click();
+            var dlAnchorElem = document.getElementById('downloadAnchorElem');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "scene.json");
+            dlAnchorElem.click();
         }
         function click_galaxy_callback() {
             console.log("click_galaxy_callback");
@@ -395,7 +395,7 @@
 
                 gCamera.setTarget(new BABYLON.Vector3(0, 0, 0));//gScale*galaxyData[1],gScale*galaxyData[2],gScale*galaxyData[3]));
 
-                
+
             }
         }
         var gInitialized = false;
@@ -428,7 +428,7 @@
                 return null;
             var scene = new BABYLON.Scene(engine);
             var black = [0, 0, 0];
-            scene.clearColor = new BABYLON.Color4(128,128,128,0);
+            scene.clearColor = new BABYLON.Color4(128, 128, 128, 0);
             // scene.clearColor = [128,128,128];
 
             // Create camera and light
@@ -462,7 +462,7 @@
 
             var keys = Object.keys(universe);
             keys.sort();
-            
+
             var pcs = null;
             // pcs = new BABYLON.PointsCloudSystem("pcs", 10, scene);
 
@@ -471,7 +471,7 @@
             var showPoints = true;
             var poly = null;
 
-            if(showPoints) {
+            if (showPoints) {
                 pcs = new BABYLON.PointsCloudSystem("pcs", 30, scene);
             } else {
 
@@ -623,16 +623,16 @@
                     ul.appendChild(li);
                 }
                 // if (gSystemMap[galaxyName].system_id < 31000000) {
-                    positions.push(new BABYLON.Vector3(x, y, z));
-                    sizes.push(new BABYLON.Vector3(magnitude, magnitude, magnitude));
+                positions.push(new BABYLON.Vector3(x, y, z));
+                sizes.push(new BABYLON.Vector3(magnitude, magnitude, magnitude));
 
-                    const babylonColor = new BABYLON.Color3(color[0], color[1], color[2]);
-                    colors.push(BABYLON.Color4.FromColor3(babylonColor, 1));
+                const babylonColor = new BABYLON.Color3(color[0], color[1], color[2]);
+                colors.push(BABYLON.Color4.FromColor3(babylonColor, 1));
                 // }
                 // *** Add to our lookup of initial indicies to particles
 
             }
-            if(showPoints) {
+            if (showPoints) {
                 pcs.addPoints(positions.length, (particle, i) => {
                     particle.position = positions[i];
                     particle.color = colors[i];
@@ -778,7 +778,7 @@
             }
         }
 
-        // loadExternalFile("./Output/Universe.json", function(text){
+        // loadExternalFile("map/./Output/Universe.json", function(text){
         /*
         [
     ["WISEA J000001.32+153034.7",0.000061,0.000017,0.627782,0.000000,0.000000,0.627782,"G",38.860000,0.460000,"SPEC"],
@@ -912,7 +912,7 @@
         //         data.push(system);
         //     }
         //     // startApplication(data);
-        loadExternalFile("systems.json", function (text) {
+        loadExternalFile("map/systems.json", function (text) {
             try {
                 gSystems = JSON.parse(text);
                 startApplication(gSystems);
