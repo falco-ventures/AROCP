@@ -53,9 +53,11 @@ function parse_my_url() {
         }
     }
 }
+
 function sendCommand(commandName, paramString, callback, command_type, headers, body, callback_data) {
     if (command_type == undefined)
-        command_type = "GET"
+        command_type = "GET";
+
     function reqListener() {
         try {
             callback(this, callback_data);
@@ -66,11 +68,13 @@ function sendCommand(commandName, paramString, callback, command_type, headers, 
 
     const req = new XMLHttpRequest();
     req.onload = reqListener;
+
     var url = commandName;
     if (paramString != "") {
         url = url + "?" + paramString;
     }
     req.open(command_type, url);
+
     if (headers != undefined) {
         for (let header in headers) {
             req.setRequestHeader(String(header), String(headers[header]));
@@ -78,17 +82,18 @@ function sendCommand(commandName, paramString, callback, command_type, headers, 
     }
 
     if (body != undefined && body != null) {
-        // If body is a string (e.g. x-www-form-urlencoded), send as-is.
-        // If it's an object, send JSON.
         if (typeof body === "string") {
+            // e.g. x-www-form-urlencoded
             req.send(body);
         } else {
+            // JSON body
             req.send(JSON.stringify(body));
         }
     } else {
         req.send();
     }
 }
+
 
 var gCharacterInfo = new Array();
 var loginCredentials = new Object();
@@ -220,25 +225,31 @@ function authorization_callback(data, callback_data) {
         }
     }
 }
-
 function authorize_character_code_local(code) {
-    var auth = "ZGI4ZTMzOTg5N2JiNDE3Zjk3MWZmMDdlZjYxN2U5Njc6TXNMZWxlZTFMcmo5eG5zYXhHdFozMW5ITHVyRG9VT1J2NjZkeU1hdA==";
-    var base = "https://login.eveonline.com/oauth/token";
+    // Build Basic auth from your current client id + secret
+    const clientId = "5fe7b21736e748c6a78d9e4f98ff536e";
+    const clientSecret = "5e0tEfn1tNwFPvEz4EEcXcJIpSngdGQBc3cbdOgU";
+    const auth = btoa(clientId + ":" + clientSecret);
+
+    var base = "https://login.eveonline.com/oauth/token"; // CCP example uses this endpoint
     var paramString = "";
     var command_type = "POST";
     var headers = {};
 
-    headers["Content-Type"] = "application/x-www-form-urlencoded";
+    headers["Content-Type"] = "application/json";
     headers["Authorization"] = "Basic " + auth;
 
-    var body =
-        "grant_type=authorization_code" +
-        "&code=" + encodeURIComponent(code);
+    // JSON body, like in CCP's step-by-step example
+    var body = {
+        grant_type: "authorization_code",
+        code: code
+    };
 
     var callback_data = code;
 
     sendCommand(base, paramString, authorization_callback, command_type, headers, body, callback_data);
 }
+
 
 
 function authorize_character_code(code) {
