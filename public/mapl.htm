@@ -778,7 +778,7 @@
             }
         }
 
-        // loadExternalFile("map/./Output/Universe.json", function(text){
+        // loadExternalFile("/map/./Output/Universe.json", function(text){
         /*
         [
     ["WISEA J000001.32+153034.7",0.000061,0.000017,0.627782,0.000000,0.000000,0.627782,"G",38.860000,0.460000,"SPEC"],
@@ -912,7 +912,7 @@
         //         data.push(system);
         //     }
         //     // startApplication(data);
-        loadExternalFile("map/systems.json", function (text) {
+        loadExternalFile("/map/systems.json", function (text) {
             try {
                 gSystems = JSON.parse(text);
                 startApplication(gSystems);
