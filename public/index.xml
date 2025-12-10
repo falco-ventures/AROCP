@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>AeroCorp</title>
-    <link>http://localhost:1313/AROCP/</link>
+    <link>/AROCP/</link>
     <description>Recent content on AeroCorp</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 18 Jun 2024 20:11:33 -0400</lastBuildDate>
-    <atom:link href="http://localhost:1313/AROCP/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="/AROCP/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Welcome to AeroCorp</title>
-      <link>http://localhost:1313/AROCP/posts/my-first-post/</link>
+      <link>/AROCP/posts/my-first-post/</link>
       <pubDate>Tue, 18 Jun 2024 20:11:33 -0400</pubDate>
-      <guid>http://localhost:1313/AROCP/posts/my-first-post/</guid>
+      <guid>/AROCP/posts/my-first-post/</guid>
       <description>&#xA;Local Login Website Login </description>
     </item>
   </channel>
