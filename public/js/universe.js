@@ -46,7 +46,7 @@ var gInitialized = false;
 
 function click_login() {
     var eveServer = "https://login.eveonline.com/oauth/authorize"
-    var scopes = "response_type=code&redirect_uri=https://falco-ventures.github.io/AROCP/&client_id=db8e339897bb417f971ff07ef617e967&scope=publicData%20esi-location.read_location.v1%20esi-location.read_ship_type.v1%20esi-skills.read_skills.v1%20esi-skills.read_skillqueue.v1%20esi-universe.read_structures.v1%20esi-ui.write_waypoint.v1%20esi-fittings.read_fittings.v1%20esi-fittings.write_fittings.v1%20esi-location.read_online.v1%20esi-clones.read_implants.v1%20esi-characters.read_fatigue.v1";
+    var scopes = "response_type=code&redirect_uri=https://falco-ventures.github.io/AROCP/&client_id=5fe7b21736e748c6a78d9e4f98ff536e&scope=publicData%20esi-location.read_location.v1%20esi-location.read_ship_type.v1%20esi-skills.read_skills.v1%20esi-skills.read_skillqueue.v1%20esi-universe.read_structures.v1%20esi-ui.write_waypoint.v1%20esi-fittings.read_fittings.v1%20esi-fittings.write_fittings.v1%20esi-location.read_online.v1%20esi-clones.read_implants.v1%20esi-characters.read_fatigue.v1";
     window.location = eveServer + "?" + scopes;
 
 }
@@ -763,8 +763,8 @@ function ProcessScouts(response) {
             myLines.push(myLine);
 
             myColorLine = new Array();
-            myColorLine.push(new BABYLON.Color4(0,1,0,1));
-            myColorLine.push(new BABYLON.Color4(0,1,0,1));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1));
+            myColorLine.push(new BABYLON.Color4(0, 1, 0, 1));
             myColors.push(myColorLine);
 
             myLine = new Array();
@@ -792,7 +792,7 @@ function ProcessScouts(response) {
             AddMenuItem(groupString, dstText);
 
             var dstText = gSystemsList[dstScout.in_system_id].name
-            + " ( Distance: " + jumpableWormHoles[w].distance.toFixed(1)
+                + " ( Distance: " + jumpableWormHoles[w].distance.toFixed(1)
                 + ")";
             AddMenuItem(groupString, dstText);
 
@@ -810,7 +810,7 @@ function ProcessScouts(response) {
                 + ")";
             var system = gSystemsList[system_id];
             var destString = system.name + wormholeSig + " Time: " + scoutData.remaining_hours;
-            
+
             if (system.security_status >= 0.5) {
                 AddMenuItem("Thera1", destString);
             } else if (system.security_status >= 0.0) {
@@ -824,14 +824,14 @@ function ProcessScouts(response) {
             myLine.push(Get3DPositionFromSystem(system))
             myLines.push(myLine);
 
-            var lineColor=ColorFromSecurity(system.security_status);
+            var lineColor = ColorFromSecurity(system.security_status);
             var myColorLine = new Array();
             myColorLine.push(lineColor);
             myColorLine.push(lineColor);
             myColors.push(myColorLine);
 
 
-            
+
         }
         gScoutLines = create_gate_lines(myLines, myColors);
 
