@@ -44,7 +44,7 @@ var gInitialized = false;
 
 function click_login() {
     const clientId = "5fe7b21736e748c6a78d9e4f98ff536e";
-    const redirectUri = "https://falco-ventures.github.io/AROCP/map/index.html";
+    const redirectUri = "https://localhost:8000/AROCP/map/index.html";
 
     const scopes = [
         "publicData",

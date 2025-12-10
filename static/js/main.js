@@ -241,9 +241,6 @@ function authorize_character_code_local(code) {
     const body =
         "grant_type=authorization_code" +
         "&code=" + encodeURIComponent(code);
-    // you *can* also add:
-    // + "&redirect_uri=" + encodeURIComponent("https://falco-ventures.github.io/AROCP/map/index.html");
-
     const callback_data = { code: code };
 
     sendCommand(base, paramString, authorization_callback, command_type, headers, body, callback_data);
