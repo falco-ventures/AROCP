@@ -53,7 +53,6 @@ function parse_my_url() {
         }
     }
 }
-
 function sendCommand(commandName, paramString, callback, command_type, headers, body, callback_data) {
     if (command_type == undefined)
         command_type = "GET"
@@ -79,9 +78,16 @@ function sendCommand(commandName, paramString, callback, command_type, headers, 
     }
 
     if (body != undefined && body != null) {
-        req.send(JSON.stringify(body));
-    } else
+        // If body is a string (e.g. x-www-form-urlencoded), send as-is.
+        // If it's an object, send JSON.
+        if (typeof body === "string") {
+            req.send(body);
+        } else {
+            req.send(JSON.stringify(body));
+        }
+    } else {
         req.send();
+    }
 }
 
 var gCharacterInfo = new Array();

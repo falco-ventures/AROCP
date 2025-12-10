@@ -237,22 +237,43 @@
             rawFile.send(null);
         }
 
-        function sendCommand(commandName, paramString, callback) {
+        function sendCommand(commandName, paramString, callback, command_type, headers, body, callback_data) {
+            if (command_type == undefined)
+                command_type = "GET"
             function reqListener() {
-                // console.log(this.responseText);
                 try {
-                    callback(JSON.parse(this.responseText));
+                    callback(this, callback_data);
                 } catch {
-                    callback(null);
+                    callback(null, callback_data);
                 }
             }
 
             const req = new XMLHttpRequest();
-            req.addEventListener("load", reqListener);
-            var url = commandName + "?" + paramString
-            req.open("GET", url);
-            req.send();
+            req.onload = reqListener;
+            var url = commandName;
+            if (paramString != "") {
+                url = url + "?" + paramString;
+            }
+            req.open(command_type, url);
+            if (headers != undefined) {
+                for (let header in headers) {
+                    req.setRequestHeader(String(header), String(headers[header]));
+                }
+            }
+
+            if (body != undefined && body != null) {
+                // If body is a string (e.g. x-www-form-urlencoded), send as-is.
+                // If it's an object, send JSON.
+                if (typeof body === "string") {
+                    req.send(body);
+                } else {
+                    req.send(JSON.stringify(body));
+                }
+            } else {
+                req.send();
+            }
         }
+
 
         function create_selection_sphere(name) {
             var sphere = BABYLON.MeshBuilder.CreateSphere("SelectionSphere", { diameter: 0.1, segments: 32 }, g3DScene);
